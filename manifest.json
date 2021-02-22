@@ -1,0 +1,38 @@
+{
+    "name": "Our Brands Extension",
+    "description": "Reveal which projects are from Amazon-owned brands.",
+    "version": "0.1",
+    "manifest_version": 2,
+    "content_scripts": [
+        {
+          "matches": [
+            "<all_urls>"
+          ],
+          "js": ["jquery-3.5.1.min.js", "content.js"]
+        }
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "/assets/icon-16.png",
+            "19": "/assets/icon-19.png",
+            "32": "/assets/icon-32.png",
+            "64": "/assets/icon-64.png",
+            "128": "/assets/icon-128.png"
+        }
+    },
+    "permissions": [
+        "activeTab"
+    ],
+    "icons": {
+        "16": "/assets/icon-16.png",
+        "19": "/assets/icon-19.png",
+        "32": "/assets/icon-32.png",
+        "64": "/assets/icon-64.png",
+        "128": "/assets/icon-128.png"
+    }
+}
