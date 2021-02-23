@@ -1,6 +1,5 @@
 console.log("popup.js", window.location.href);
 
-
 // This is needed to open links from popup.html
 window.onclick = function(e) {
     if(e.target.href) chrome.tabs.create({url: e.target.href});
@@ -35,7 +34,6 @@ function onContent(content) {
 };
 
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    var id = tabs[0].id;
     if(tabs[0].url.match(/amazon.com\/s/)) {
         document.body.className = 'enabled';
         document.body.innerHTML = '<img src="assets/ajax-loader.gif" />';

@@ -2,9 +2,10 @@
 console.log("content.js", window.location.href)
 
 
-// cache results... but we need to bust the cache if the url changes...
+// cache results?? but we need to bust the cache if the url changes...
 // because content.js doesn't seem to reload???
 let products = null; 
+
 
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

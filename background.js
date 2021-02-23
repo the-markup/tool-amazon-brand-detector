@@ -21,15 +21,15 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    console.log(`tab ${tabId} updated`, changeInfo)
-    if (changeInfo.url) {
+    if (changeInfo.url)
         urlChanged(changeInfo.url);
-    }   
 });
 
 function urlChanged(url) {
     console.log("urlChanged", url);
-    const icons = url.match(/amazon.com\/s/) ? icons_enabled : icons_disabled;
+    const icons = url.match(/amazon.com\/s/) 
+        ? icons_enabled 
+        : icons_disabled;
     chrome.browserAction.setIcon({ path : icons });
 }
 
