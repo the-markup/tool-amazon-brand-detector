@@ -1,5 +1,9 @@
-body {
+body.enabled {
     width: 400px;
     height: 200px;
-    overflow:scroll;
+}
+
+body.disabled {
+    width: 300px;
+    height: 40px;
 }

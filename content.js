@@ -2,23 +2,30 @@
 console.log("content.js", window.location.href)
 
 
+// cache results... but we need to bust the cache if the url changes...
+// because content.js doesn't seem to reload???
+let products = null; 
 
 
-/**
- * 
- * @param {string} page_url 
- */
-async function run(page_url) {
-  try {
-    const our_brands = await getOurBrands(page_url);
-    chrome.runtime.sendMessage({"type": "our_brands", "url": page_url, "info": our_brands});
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  console.log(request);
+
+  const page_url = window.location.href;
+  if(request == "get_content") {
     const all_products = getProductsOnPage(page_url);
-    chrome.runtime.sendMessage({"type": "all_products", "url": page_url, "info": all_products});
-  } catch(e) {
-    console.log("error in run", e)
+    getOurBrands(page_url).then(our_brands => {
+      products = all_products.filter( p => {
+          return our_brands.includes(p.asin);
+      });
+      console.log("returning", products)
+      sendResponse({"products": products, "total_products": all_products.length, "our_brands": our_brands.length});
+    });
   }
-}
 
+  // return true is very important. it tells the comm channel to stay open.
+  // https://stackoverflow.com/questions/20077487/chrome-extension-message-passing-response-not-sent
+  return true;
+});
 
 
 
@@ -39,22 +46,15 @@ async function getOurBrands(page_url) {
     let headers = `
     authority: www.amazon.com
     x-amazon-s-swrs-version: 64CA74525CCE3ACE0B0A7551DBB2B458,D41D8CD98F00B204E9800998ECF8427E
-    dnt: 1
     x-amazon-s-fallback-url: https://www.amazon.com/s?k=${query}&rh=p_n_feature_forty-seven_browse-bin%3A21180942011&dc&qid=${qid}&rnid=21180941011&ref=sr_nr_p_n_feature_forty-seven_browse-bin_1
     rtt: 150
     x-amazon-rush-fingerprints: 
-    user-agent: ${navigator.userAgent}
     content-type: application/json
     accept: text/html,*/*
     x-amazon-s-mismatch-behavior: FALLBACK
     x-requested-with: XMLHttpRequest
     downlink: 3.8
     ect: 4g
-    origin: https://www.amazon.com
-    sec-fetch-site: same-origin
-    sec-fetch-mode: cors
-    sec-fetch-dest: empty
-    referer: ${page_url}
     accept-language: en-US,en;q=0.9`;
 
     let xhr = new XMLHttpRequest();
@@ -139,18 +139,6 @@ function getProductsOnPage(page_url) {
 
 
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if(!request.type) return;
-  if(request.type === "urlchange") run(request.url);
-});
-
-run(window.location.href)
-
-
-
-
-
-
 
 
 /*
@@ -174,34 +162,4 @@ xhr.onerror = function() {
   console.log("Request failed");
   reject()
 };
-
-setInterval(() => {
-  var now = Date.now();
-  chrome.runtime.sendMessage({"type": "heartbeat", "message": `content.js: ${now}`});
-}, 1000);
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log(request);
-});
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if( request.message === "clicked_browser_action" ) {
-    var firstHref = $("a[href^='http']").eq(0).attr("href");
-    console.log(firstHref);
-    chrome.runtime.sendMessage({"message": "open_new_tab", "url": firstHref});
-  }
-});
-
-chrome.runtime.sendMessage({"message": "add_stuff", "stuff": `<p>From content.js: ${now}</p>`});
-chrome.runtime.sendMessage({"message": "this_url", "url": window.location.href});
-
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
-    if (request.greeting == "hello")
-      sendResponse({farewell: "goodbye"});
-  }
-);
 */
