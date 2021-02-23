@@ -1,40 +1,30 @@
 console.log("popup.js", window.location.href);
 
-var now = Date.now();
-document.body.append(`<p>${now}</p>`)
 
-chrome.runtime.sendMessage({"type": "popup"}, response => {
-    console.log(response);
-});
-
-
-/*
-setInterval(() => {
-    var now = Date.now();
-    chrome.runtime.sendMessage({"type": "heartbeat", "message": `popup.js: ${now}`});
-
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        var activeTab = tabs[0];
-        chrome.tabs.sendMessage(activeTab.id, {"type": "heartbeat", "message": `popup.js to active tab: ${now}`});
-    });
-}, 1000);
+// This is needed to open links from popup.html
+window.onclick = function(e) {
+    if(e.target.href) chrome.tabs.create({url: e.target.href});
+}
 
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request);
-});
+function truncate(str) {
+    const len = 50;
+    return (str.length <= len) ? str : str.slice(0, len) + '...'
+}
 
-
-
-chrome.runtime.sendMessage({"message": "hello from popup.js"});
-
-chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
-    console.log("receied message:", request)
-    
-    if( request.message === "add_stuff" ) {
-        let stuff = request.stuff;
-        $(document.body).append(request.stuff)
-        //document.body.append(request.stuff)
+chrome.runtime.sendMessage({"type": "popup"}, function onContent(content) {
+    try {
+        var html = `<h2>Amazon Brands</h2>
+        <ol>`;
+        
+        content.forEach(p =>{
+            html += '<li>';
+            html += `<a href="${p.link}">${truncate(p.title)}</a>`;
+            html += '</li>';
+        });
+        html += `</ol>`;
+        document.body.innerHTML = html;
+    } catch(e) {
+        document.body.append("error rendering content", e);
     }
 });
-*/

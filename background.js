@@ -7,6 +7,10 @@ chrome.runtime.onInstalled.addListener(() => {
 
 console.log("background.js", window.location.href);
 
+
+
+// Content.js doesn't automatically reload every time the URL changes, so 
+// we need to tell it to re-parse the page.
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     //console.log(`tab ${tabId} updated`, changeInfo)
     if (changeInfo.url) {
@@ -16,9 +20,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     console.log(request);
-    if(!request.type) return;
+    if(!request.type) return false;
 
     if(request.type=="our_brands" || request.type=="all_products") {
         if(!content[request.url]) 
@@ -27,62 +31,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if(request.type=="popup") {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            var current_url = tabs[0].url
-            if(content[current_url])
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            var url = tabs[0].url;
+            var c = content[url];
+            var products = c.all_products.filter( p => {
+                return c.our_brands.includes(p.asin);
+            });
+            sendResponse(products);
+            console.log("sent response to popup", content[url]);
         });
     }
+
+    // return true is very important. it tells the comm channel to stay open.
+    // https://stackoverflow.com/questions/20077487/chrome-extension-message-passing-response-not-sent
+    return true; 
 });
 
 
 
 
-/*
-setInterval(() => {
-    var now = Date.now();
-    chrome.runtime.sendMessage({"type": "heartbeat", "message": `background.js: ${now}`});
-
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        var activeTab = tabs[0];
-        chrome.tabs.sendMessage(activeTab.id, {"type": "heartbeat", "message": `background.js to active tab: ${now}`});
-    });
-}, 1000);
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request);
-});
-
-
-
-
-var now = Date.now();
-chrome.runtime.sendMessage({"message": "add_stuff", "stuff": `<p>From background.js: ${now}</p>`});
-
-
-// Fires when icon is clicked.
-chrome.browserAction.onClicked.addListener(function(tab) {
-    console.log("browserAction.onClicked", tab);
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      var activeTab = tabs[0];
-      chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
-    });
-});
-
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
-        console.log(response.farewell);
-    });
-});
-
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("got a message", request)
-    if( request.message === "this_url" ) {
-        console.log("this_url", request.url);
-
-    }
-    if(request.message === 'get_products') {
-        
-    }
-});
-*/
+// Fired when a browser action icon is clicked. Does not fire if the browser action has a popup.
+// chrome.browserAction.onClicked.addListener(function(tab) {
+//     console.log("browserAction.onClicked", tab);
+// });

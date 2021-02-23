@@ -127,13 +127,11 @@ function getProductsOnPage(page_url) {
     const asin = ele.getAttribute("data-asin");
     if(!asin) return;
 
-    const title_holder = ele.querySelector("h2, span[class~='a-truncate-full']");
-    const title = title_holder.textContent;
+    const title = ele.querySelector("h2, span[class~='a-truncate-full']").textContent;
     let link = ele.querySelector("a").getAttribute("href");
-    if(!link.match(/^http/)) 
-      link = new URL(link, root).href;
-    const p = {"asin": asin, "title": title.trim(), "link": link};
-    products.push(p);
+    if(!link.match(/^http/)) link = new URL(link, root).href;
+
+    products.push({"asin": asin, "title": title.trim(), "link": link});
   })
 
   return products;
