@@ -1,15 +1,31 @@
 console.log("popup.js", window.location.href);
 
-// This is needed to open links from popup.html
-window.onclick = function(e) {
-    if(e.target.href) chrome.tabs.create({url: e.target.href});
-}
+
+
+/**
+ * This kicks things off in popup.js
+ */
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    if(tabs[0].url.match(/amazon.com\/s/)) {
+        document.body.className = 'enabled';
+        document.body.innerHTML = '<img src="assets/ajax-loader.gif" />';
+
+        // Here's where we send the "get_content" message that is received by content.js
+        chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
+    } else {
+        document.body.className = 'disabled';
+        document.body.innerHTML = 'Not an Amazon search page';
+    }
+})
+
+
 
 function truncate(str) {
     const len = 50;
     return (str.length <= len) ? str : str.slice(0, len) + '...'
 }
 
+// 
 function onContent(content) {
     console.log("onContent", content);
     try {
@@ -36,13 +52,10 @@ function onContent(content) {
     }
 };
 
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    if(tabs[0].url.match(/amazon.com\/s/)) {
-        document.body.className = 'enabled';
-        document.body.innerHTML = '<img src="assets/ajax-loader.gif" />';
-        chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
-    } else {
-        document.body.className = 'disabled';
-        document.body.innerHTML = 'Not an Amazon search page';
-    }
-})
+
+// This is needed to open links from popup.html
+window.onclick = function(e) {
+    if(e.target.href) chrome.tabs.create({url: e.target.href});
+}
+
+
