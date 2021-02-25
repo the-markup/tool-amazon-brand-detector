@@ -6,7 +6,7 @@ window.onclick = function(e) {
 }
 
 function truncate(str) {
-    const len = 60;
+    const len = 50;
     return (str.length <= len) ? str : str.slice(0, len) + '...'
 }
 
@@ -14,7 +14,10 @@ function onContent(content) {
     console.log("onContent", content);
     try {
         var html = ``;
-        if(content.products.length > 0) {
+        if(content.error) {
+            html = `<h2>Error</h2>`;
+            html += content.error;
+        } else if(content.products.length > 0) {
             html += `<h2>Amazon Brands</h2>`;
             html += `<p>${content.total_products} products total. ${content.products.length} are Amazon.</p>`;
             html += `<ol>`;
@@ -37,7 +40,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if(tabs[0].url.match(/amazon.com\/s/)) {
         document.body.className = 'enabled';
         document.body.innerHTML = '<img src="assets/ajax-loader.gif" />';
-        chrome.tabs.sendMessage(id, "get_content", onContent);
+        chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
     } else {
         document.body.className = 'disabled';
         document.body.innerHTML = 'Not an Amazon search page';
