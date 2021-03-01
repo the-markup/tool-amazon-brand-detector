@@ -14,7 +14,7 @@ console.log("content.js", window.location.href)
  * @param {*} sendResponse 
  */
 function onMessage(request, sender, sendResponse) {
-    console.log(request);
+    console.log("onMessage request", request);
 
     if(request === "get_content") {
         getContent().then(sendResponse)
@@ -39,6 +39,9 @@ async function getContent() {
         const our_brands = await getOurBrands(window.location.href);  // list of ASINs
         const all_products = getProductsOnPage(); // objects like  {"asin": "", "title": "", "link": ""}
         const ob_products = [];                   // overlap
+
+        console.log('our_brands', our_brands);
+        console.log('all_products', all_products);
 
         // Which products have the honor of going into the ob_products array?
         for(const p of all_products) {
@@ -72,11 +75,14 @@ async function getContent() {
  */
 async function second_ob_check(product) {
     return new Promise(function (resolve, reject) {
-        console.log(`doing some crazy check for (${product.asin}) ${product.title}`)
-        setTimeout(() => { 
-            if(product.title.match(/Echo/) || product.title.match(/Kindle/)) resolve(true);
-            else resolve(false);
-        }, Math.random()*50);
+        //console.log(`doing some crazy check for (${product.asin}) ${product.title}`)
+        
+        if(product.title.match(/Echo/) 
+            || product.title.match(/Kindle/)
+            || product.title.match(/Fire.+tablet/i)) {
+                resolve(true);
+        }   
+        else resolve(false);
     });
 }
 
@@ -100,7 +106,7 @@ function getProductsOnPage() {
         });
     });
 
-    console.log('returning all_products', products);
+    //console.log('returning all_products', products);
     return products;
 }
 
