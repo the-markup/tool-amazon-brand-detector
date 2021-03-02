@@ -2,8 +2,7 @@
 Find out which products from a search on Amazon are from brands that are owned by Amazon.
 
 
-
-
+# Sample URLs
 
 Original URL:   https://www.amazon.com/s?k=whiskey+glasses&ref=nb_sb_noss
 Our Brands URL: https://www.amazon.com/s?k=whiskey+glasses&rh=p_n_feature_forty-seven_browse-bin%3A21180942011&dc&qid=1614717163&rnid=21180941011&ref=sr_nr_p_n_feature_forty-seven_browse-bin_1

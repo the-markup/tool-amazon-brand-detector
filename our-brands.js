@@ -10,16 +10,18 @@ const MRKP_ENDPOINT = "http://localhost:1773";
 async function getOurBrandsProducts(ob_link) {
     console.log(`getOurBrandsProducts(${ob_link})`);
 
+    // Construct the endpoint for the request
+    const api_url = ob_link.replace("/s?", "/s/query?dc&");
+    const endpoint = new URL(api_url, "https://www.amazon.com"); 
+
     let page = 1;
     let products = [];
-    let totalResultCount = 0;
-    let asinOnPageCount = 0;
+    let metadata = null;
 
     // Call the API endpoint repeatedly while increasing page number until there are no more products.
     do {
-        // Construct the endpoint for the request
-        const api_url = ob_link.replace("https://www.amazon.com/s?", "https://www.amazon.com/s/query?dc&");
-        const endpoint = new URL(api_url); 
+
+        // Set the page number of results we want.
         endpoint.searchParams.set("page", page);
 
         // Assemble the headers
@@ -43,29 +45,29 @@ async function getOurBrandsProducts(ob_link) {
         const elapsed = Date.now() - start;
         console.log(`query took ${(elapsed/1000).toFixed(2)} seconds and returned ${response.length} bytes`)
 
-        // TODO: Uncomment me to submit data to MRKP_ENDPOINT!
+        // This is where the data is posted to the MRKP_ENDPOINT
         await submitData({"data": response, "query": window.location.href}); 
 
         // The XHR request returns a list of JSON objects, so let's separate them out into a list.
         const objects = parse(response);
 
-        products = products.concat(getProducts(objects))
+        // add all of the product objects to the growing product list.
+        getProducts(objects).forEach( p => products.push(p) );
         console.log(`products.length ${products.length}`)
 
-        const metadata = getMetadata(objects);
+        // Get the metadata object from the API response
+        metadata = getMetadata(objects);
         console.log(`metadata`, metadata);
 
+        // If we don't have certain keys, we can't decide if we're done looping, so that's bad.
         if(!("totalResultCount" in metadata) || !("asinOnPageCount" in metadata)) {
             throw "couldn't find totalResultCount or asinOnPageCount in metadata"
         }
 
-        totalResultCount = metadata.totalResultCount;
-        asinOnPageCount = metadata.asinOnPageCount;
         page++;
 
-    } while(totalResultCount > products.length && asinOnPageCount>0);
+    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0);
 
-    console.log(`products.length = ${products.length}`)
     return products;
 }
 
@@ -79,7 +81,7 @@ function parse(text) {
     const objects = [];
     text.split("&&&").forEach(json => {
         if((typeof json) !== "string") return;
-        if(json.trim()=="") return;
+        if(json.trim() == "") return;
 
         try {
             const obj = JSON.parse(json);
@@ -136,7 +138,8 @@ function getProducts(objects) {
 
 
 /**
- * 
+ * Post some stuff to MRKP_ENDPOINT.  
+ * If it fails, don't freak out. Just console.out the error and move on. 
  */
 async function submitData(data) {
     try {
@@ -147,7 +150,8 @@ async function submitData(data) {
     }
 }
 
-  
+
+// If this isn't loaded in a browser, export some stuff.
 if (typeof window === 'undefined') {
     module.exports = { getOurBrands };
 }

@@ -1,9 +1,9 @@
-// We want to immediatley load content when the content script loads
+// We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
 // This can either be chained to a then() when popup.js requests the content
 // Or it can be set to another promise when background tells the script
 // that the URL has changed. 
-let content = loadContent();
+let contentPromise = loadContent();
 
 
 
@@ -23,11 +23,13 @@ function onMessage(request, sender, sendResponse) {
 
     // reassign the promise 
     if(request == "url_changed") {
-        content = loadContent();
+        contentPromise = loadContent();
     }
 
+    // If the content is already loaded, this will be resolved and return immediately
+    // If it's still working, it will finish and then rend the content back to popup.js
     if(request === "get_content") {
-        content.then(sendResponse)
+        contentPromise.then(sendResponse)
     }
 
     return true;
@@ -54,9 +56,8 @@ async function loadContent() {
             return {"products": []};
         }
 
-        const url = "https://www.amazon.com"+ob_link.getAttribute("href");
-
-        const amazon_products = await getOurBrandsProducts(url);    // objects like  {"asin": "", "title": "", "link": ""}
+        const href = ob_link.getAttribute("href");
+        const amazon_products = await getOurBrandsProducts(href);    // objects like  {"asin": "", "title": "", "link": ""}
         const page_products = getProductsOnPage();                  // objects like  {"asin": "", "title": "", "link": ""}
         const ob_products = [];                                     // overlap products
 
