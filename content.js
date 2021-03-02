@@ -23,6 +23,7 @@ function onMessage(request, sender, sendResponse) {
 
     // reassign the promise 
     if(request == "url_changed") {
+        if(contentPromise) contentPromise.reject();
         contentPromise = loadContent();
     }
 
