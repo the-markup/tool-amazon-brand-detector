@@ -20,3 +20,8 @@ API Endpoint:   https://www.amazon.com/s/query?dc&k=tablets&page=1&qid=161471742
 Original URL:   https://www.amazon.com/s?k=tablets&page=2&qid=1614717479&ref=sr_pg_2
 Our Brands URL: https://www.amazon.com/s?k=tablets&rh=p_n_feature_forty-seven_browse-bin%3A21180942011&dc&qid=1614717479&rnid=21180941011&ref=sr_nr_p_n_feature_forty-seven_browse-bin_1
 API Endpoint: https://www.amazon.com/s/query?dc&k=tablets&page=1&qid=1614717479&ref=sr_nr_p_n_feature_forty-seven_browse-bin_1&rh=p_n_feature_forty-seven_browse-bin%3A21180942011&rnid=21180941011
+
+
+Original URL: https://www.amazon.com/s?k=boxes&rh=p_n_specials_match%3A21213697011&dc&qid=1614722915&rnid=21213696011&ref=sr_nr_p_n_specials_match_1
+Our Brands URL: https://www.amazon.com/s?k=boxes&rh=p_n_specials_match%3A21213697011%2Cp_n_feature_forty-seven_browse-bin%3A21180942011&dc&qid=1614722956&rnid=21180941011&ref=sr_nr_p_n_feature_forty-seven_browse-bin_1
+API Endpoint: https://www.amazon.com/s/query?dc&k=boxes&page=1&qid=1614722956&ref=sr_nr_p_n_feature_forty-seven_browse-bin_1&rh=p_n_specials_match%3A21213697011%2Cp_n_feature_forty-seven_browse-bin%3A21180942011&rnid=21180941011

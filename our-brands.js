@@ -46,7 +46,7 @@ async function getOurBrandsProducts(ob_link) {
         console.log(`query took ${(elapsed/1000).toFixed(2)} seconds and returned ${response.length} bytes`)
 
         // This is where the data is posted to the MRKP_ENDPOINT
-        await submitData({"data": response, "query": window.location.href}); 
+        //await submitData({"data": response, "query": window.location.href}); 
 
         // The XHR request returns a list of JSON objects, so let's separate them out into a list.
         const objects = parse(response);
@@ -66,7 +66,7 @@ async function getOurBrandsProducts(ob_link) {
 
         page++;
 
-    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0);
+    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < 5);
 
     return products;
 }

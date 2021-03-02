@@ -3,8 +3,8 @@
 // This can either be chained to a then() when popup.js requests the content
 // Or it can be set to another promise when background tells the script
 // that the URL has changed. 
-let contentPromise = loadContent();
-
+let promises = { };
+promises[window.location.href] = loadContent()
 
 
 /**
@@ -23,20 +23,18 @@ function onMessage(request, sender, sendResponse) {
 
     // reassign the promise 
     if(request == "url_changed") {
-        //if(contentPromise) contentPromise.reject();
-        contentPromise = loadContent();
+        promises[window.location.href] = loadContent();
     }
 
     // If the content is already loaded, this will be resolved and return immediately
     // If it's still working, it will finish and then rend the content back to popup.js
     if(request === "get_content") {
-        contentPromise.then(sendResponse)
+        promises[window.location.href].then(sendResponse)
     }
 
     return true;
 }
-
-
+chrome.runtime.onMessage.addListener(onMessage);
 
 
 
@@ -49,13 +47,17 @@ function onMessage(request, sender, sendResponse) {
  */
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
+
+    // First find the "Our Brands" link on the page
+    var ob_link;
     try {
-        // First find the "Our Brands" link on the page
-        const ob_link = document.querySelector('[aria-label="Our Brands"] a')
-        if(!ob_link) {
-            console.log("WARNING: Our Brands link not found.  Returning nothing.")
-            return {"products": []};
-        }
+        ob_link = await queryWaitFor('[aria-label="Our Brands"] a');
+    } catch(e) {
+        console.log("WARNING: Our Brands link not found.  Returning nothing.")
+        return { "products": [] };
+    }
+
+    try {
 
         const href = ob_link.getAttribute("href");
         const amazon_products = await getOurBrandsProducts(href);    // objects like  {"asin": "", "title": "", "link": ""}
@@ -108,9 +110,10 @@ function first_ob_check(product, amazon_products) {
  */
 async function second_ob_check(product) {
     return new Promise(function (resolve, reject) {
-        if(product.title.match(/Echo/) 
+        if(    product.title.match(/Echo/) 
             || product.title.match(/Kindle/)
-            || product.title.match(/Fire.+tablet/i)) {
+            || product.title.match(/Fire.+tablet/i) 
+            || product.title.match(/Amazon Basics/)) {
                 resolve(true);
         }   
         else resolve(false);
@@ -179,5 +182,30 @@ function getTitle(ele) {
     return "Unknown";
 }
 
+/**
+ * Returns a promise that will keep querying for an object until it is found, or
+ * until the timeout is up.
+ * @param {*} q 
+ * @param {*} timeout 
+ */
+async function queryWaitFor(q, timeout=2000) {
+    return new Promise(function (resolve, reject) {
+        function find() {
+            ele = document.querySelector(q);
+            if(ele) {
+                resolve(ele);
+            } else {
+                timeout -= 100;
+                if(timeout > 0) {
+                    setTimeout(find, 100);
+                } else {
+                    reject();
+                }       
+            }
+        };
+        find();
+    });
+}
 
-chrome.runtime.onMessage.addListener(onMessage);
+
+
