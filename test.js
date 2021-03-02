@@ -1,4 +1,8 @@
+// IN PROGRESS --
+
 const { getOurBrands } = require('./our-brands')
+
+
 
 async function run() {
     const page_url = "https://www.amazon.com/s?k=lcd";

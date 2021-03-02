@@ -1,4 +1,9 @@
-console.log("content.js", window.location.href)
+// We want to immediatley load content when the content script loads
+// Keep the promise returned from loadContent
+// This can either be chained to a then() when popup.js requests the content
+// Or it can be set to another promise when background tells the script
+// that the URL has changed. 
+let content = loadContent();
 
 
 
@@ -16,8 +21,13 @@ console.log("content.js", window.location.href)
 function onMessage(request, sender, sendResponse) {
     console.log("onMessage request", request);
 
+    // reassign the promise 
+    if(request == "url_changed") {
+        content = loadContent();
+    }
+
     if(request === "get_content") {
-        getContent().then(sendResponse)
+        content.then(sendResponse)
     }
 
     return true;
@@ -34,32 +44,42 @@ function onMessage(request, sender, sendResponse) {
  * 3. see where the overlap is
  * 4. and send that back to popup.js
  */
-async function getContent() {
+async function loadContent() {
+    console.log(`loadContent(${window.location.href})`);
     try {
-        const our_brands = await getOurBrands(window.location.href);  // list of ASINs
-        const all_products = getProductsOnPage(); // objects like  {"asin": "", "title": "", "link": ""}
-        const ob_products = [];                   // overlap
-
-        console.log('our_brands', our_brands);
-        console.log('all_products', all_products);
-
-        // Which products have the honor of going into the ob_products array?
-        for(const p of all_products) {
-            if(our_brands.includes(p.asin)) {
-                ob_products.push(p);
-                continue;
-            }
-            if(await second_ob_check(p)) {
-                ob_products.push(p);
-                continue;
-            }
+        // First find the "Our Brands" link on the page
+        const ob_link = document.querySelector('[aria-label="Our Brands"] a')
+        if(!ob_link) {
+            console.log("WARNING: Our Brands link not found.  Returning nothing.")
+            return {"products": []};
         }
 
-        return {
+        const url = "https://www.amazon.com"+ob_link.getAttribute("href");
+
+        const amazon_products = await getOurBrandsProducts(url);    // objects like  {"asin": "", "title": "", "link": ""}
+        const page_products = getProductsOnPage();                  // objects like  {"asin": "", "title": "", "link": ""}
+        const ob_products = [];                                     // overlap products
+
+        console.log('amazon_products', amazon_products);
+        console.log('page_products', page_products);
+
+        // Which products have the honor of going into the ob_products array?
+        for(const p of page_products) {
+            if(first_ob_check(p, amazon_products) || await second_ob_check(p)) {
+                ob_products.push(p);
+                
+                // TODO: sometimes this doesn't work.  WHY??
+                document.querySelector(`[data-asin="${p.asin}"]`).style.cssText += 'border:1px dashed red;background-color:rgba(255,0,0,0.5)';
+            }
+        }
+        
+        const content = {
             "products": ob_products, 
-            "total_products": all_products.length, 
-            "our_brands": our_brands.length
+            "num_on_page": page_products.length,
         };
+
+        console.log("returning content", content)
+        return content;
 
     } catch(e) {
         return {"error": `problem getting content. ${e.message}`};
@@ -67,6 +87,17 @@ async function getContent() {
 }
 
 
+/**
+ * Finds the overlap between the amazon_products and the page_products
+ * @param {*} product 
+ * @param {*} amazon_products 
+ */
+function first_ob_check(product, amazon_products) {
+    for(const p of amazon_products) {
+        if(product.asin == p.asin) return true;
+    }
+    return false;
+}
 
 /**
  * Arbitrary test for products that might be Amazon-brand.
@@ -75,8 +106,6 @@ async function getContent() {
  */
 async function second_ob_check(product) {
     return new Promise(function (resolve, reject) {
-        //console.log(`doing some crazy check for (${product.asin}) ${product.title}`)
-        
         if(product.title.match(/Echo/) 
             || product.title.match(/Kindle/)
             || product.title.match(/Fire.+tablet/i)) {
@@ -87,10 +116,9 @@ async function second_ob_check(product) {
 }
 
 
-
-
 /**
  * Gets all of the products on the current page. 
+ * Returns an array of objects like  {"asin": "", "title": "", "link": ""}
  */
 function getProductsOnPage() {
     const products = [];
@@ -109,6 +137,8 @@ function getProductsOnPage() {
     //console.log('returning all_products', products);
     return products;
 }
+
+
 
 
 
@@ -146,7 +176,6 @@ function getTitle(ele) {
         return image.getAttribute("alt");
     return "Unknown";
 }
-
 
 
 chrome.runtime.onMessage.addListener(onMessage);

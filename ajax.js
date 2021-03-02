@@ -30,7 +30,9 @@ function get(endpoint, headers) {
 function post(endpoint, data) {
     return new Promise(function (resolve, reject) {
         var formData = new FormData();
-        formData.append('data', data);
+        for (const [key, value] of Object.entries(data)) {
+            formData.append(key, value);
+        }
         
         var xhr = new XMLHttpRequest();
         //console.log(`opening POST connection to ${endpoint}`);

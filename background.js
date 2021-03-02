@@ -14,19 +14,35 @@ const icons_enabled = {
     "128": "/assets/icons/128.png"
 }
 
+/**
+ * Fires when the active tab in a window changes. 
+ * Note that the tab's URL may not be set at the time this event fired, 
+ * but you can listen to onUpdated events so as to be notified when a URL is
+ */
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     chrome.tabs.getSelected(null, function(tab) {
-        urlChanged(tab.url);
+        updateIcon(tab.url);
     });
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.url)
-        urlChanged(changeInfo.url);
+/**
+ * Fires when the URL in a tab changes
+ * We need to tell the tab that the URL has changed because the content script doesn't always
+ * automatically reload.
+ */
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.url) {
+        chrome.tabs.sendMessage(tabId, "url_changed");
+        updateIcon(changeInfo.url);
+    }
 });
 
-function urlChanged(url) {
-    console.log("urlChanged", url);
+
+/**
+ * Change the popup icon based on the current URL
+ * @param {string} url 
+ */
+function updateIcon(url) {
     const icons = url.match(/amazon.com\/s/) 
         ? icons_enabled 
         : icons_disabled;

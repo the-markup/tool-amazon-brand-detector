@@ -4,6 +4,7 @@ console.log("popup.js", window.location.href);
 
 /**
  * This kicks things off in popup.js
+ * Query for the active tab in the browser and then decide what to do.
  */
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if(tabs[0].url.match(/amazon.com\/s/)) {
@@ -20,12 +21,19 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
 
 
-function truncate(str) {
-    const len = 50;
+function truncate(str, len) {
     return (str.length <= len) ? str : str.slice(0, len) + '...'
 }
 
-// 
+
+/**
+ * Render the content
+ * @param {object} content 
+ * If content contains an "error" key, use the value to render an error message.
+ * Otherwise, there should be 2 keys:
+ * num_on_page: the total number of products on the current page
+ * products: an array of "Our Brand" objects with "asin", "title", and "link" properties
+ */
 function onContent(content) {
     console.log("onContent", content);
     try {
@@ -35,11 +43,11 @@ function onContent(content) {
             html += content.error;
         } else if(content.products.length > 0) {
             html += `<h2>Amazon Brands</h2>`;
-            html += `<p>${content.total_products} products total. ${content.products.length} are Amazon.</p>`;
+            html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
             html += `<ol>`;
             content.products.forEach(p => {
                 html += '<li>';
-                html += `<a href="${p.link}">${truncate(p.title)}</a>`;
+                html += `<a href="${p.link}">${truncate(p.title, 50)}</a>`;
                 html += '</li>';
             });
             html += `</ol>`;
