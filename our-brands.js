@@ -7,12 +7,11 @@ const MRKP_ENDPOINT = "http://localhost:1773";
  * Gets a list of Amazon-owned products
  * Returns an array of objects like  {"asin": "", "title": "", "link": ""}
  */
-async function getOurBrandsProducts(ob_link) {
-    console.log(`getOurBrandsProducts(${ob_link})`);
+async function getOurBrandsProducts(api_url) {
+    console.log(`getOurBrandsProducts(${api_url})`);
 
     // Construct the endpoint for the request
-    const api_url = ob_link.replace("/s?", "/s/query?dc&");
-    const endpoint = new URL(api_url, "https://www.amazon.com"); 
+    let endpoint = new URL(api_url, "https://www.amazon.com"); 
 
     let page = 1;
     let products = [];
@@ -20,8 +19,8 @@ async function getOurBrandsProducts(ob_link) {
 
     // Call the API endpoint repeatedly while increasing page number until there are no more products.
     do {
-
         // Set the page number of results we want.
+        console.log(`page ${page}`)
         endpoint.searchParams.set("page", page);
 
         // Assemble the headers
@@ -31,7 +30,7 @@ async function getOurBrandsProducts(ob_link) {
         downlink: 3.8
         accept-language: en-US,en;q=0.9
         x-amazon-s-swrs-version: 64CA74525CCE3ACE0B0A7551DBB2B458,D41D8CD98F00B204E9800998ECF8427E
-        x-amazon-s-fallback-url: ${ob_link}
+        x-amazon-s-fallback-url: ${window.location.href}
         rtt: 150
         x-amazon-rush-fingerprints: 
         ect: 4g

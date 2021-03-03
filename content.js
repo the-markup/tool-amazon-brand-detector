@@ -37,6 +37,24 @@ function onMessage(request, sender, sendResponse) {
 chrome.runtime.onMessage.addListener(onMessage);
 
 
+/**
+ * Tries to find the Our Brands link to construct the API endpoint URL
+ * If not, it tries to construct it manually. 
+ */
+async function getAPIEndpoint() {
+    try {
+        const ele = await queryWaitFor('[aria-label="Our Brands"] a');
+        console.log(`Using Our Brands link to construct api endpoint`);
+        return ele.getAttribute("href").replace("/s?", "/s/query?dc&");
+    } catch(e) {
+        console.log(`Didn't find Our Brands link. Using fallback method.`);
+        var url = new URL(window.location.href.replace("/s?", "/s/query?")); 
+        url.searchParams.set("ref", "sr_nr_p_n_feature_forty-seven_browse-bin_1");
+        url.searchParams.set("rh", "p_n_feature_forty-seven_browse-bin:21180942011");
+        //url.searchParams.set("dc", "");
+        return url.href;
+    }
+}
 
 /**
  * Gets all the data that popup.js needs to render the page.
@@ -48,19 +66,9 @@ chrome.runtime.onMessage.addListener(onMessage);
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
-    // First find the "Our Brands" link on the page
-    var ob_link;
     try {
-        ob_link = await queryWaitFor('[aria-label="Our Brands"] a');
-    } catch(e) {
-        console.log("WARNING: Our Brands link not found.  Returning nothing.")
-        return { "products": [] };
-    }
-
-    try {
-
-        const href = ob_link.getAttribute("href");
-        const amazon_products = await getOurBrandsProducts(href);    // objects like  {"asin": "", "title": "", "link": ""}
+        const api_url = await getAPIEndpoint();
+        const amazon_products = await getOurBrandsProducts(api_url);    // objects like  {"asin": "", "title": "", "link": ""}
         const page_products = getProductsOnPage();                  // objects like  {"asin": "", "title": "", "link": ""}
         const ob_products = [];                                     // overlap products
 
