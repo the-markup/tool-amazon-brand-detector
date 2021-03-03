@@ -2,6 +2,8 @@
 // This happens in submtiData()
 const MRKP_ENDPOINT = "http://localhost:1773";
 const MAX_API_PAGES = 5;
+const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics/, /Fire.+tablet/i];
+
 
 // We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
@@ -100,8 +102,8 @@ function stain(asin) {
 
 /**
  * Returns true if ele is an "Our Brand" product, which is determined using a few tests.
- * NOTE: This is where you can add more checks. It should be 
- * trivial to make this async and throw an "await" in front of the call above.
+ * NOTE: This is where you can add more checks. 
+ * It should be trivial to make this async and throw an "await" in front of the call above.
  */
 function isAmazonBrand(ele, api_results) {
 
@@ -109,9 +111,9 @@ function isAmazonBrand(ele, api_results) {
         return true;
 
     const title = getTitle(ele);
-    if( title.match(/Echo|Kindle|Amazon Basics/) 
-        || title.match(/Fire.+tablet/i))
-        return true;
+    for(const pattern of TITLE_PATTERNS) {
+        if(title.match(pattern)) return true;
+    }
 
     if(ele.textContent.match(/Featured from our brands/))
         return true;
