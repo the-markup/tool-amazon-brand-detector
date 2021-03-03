@@ -8,7 +8,7 @@
           "matches": [
             "https://www.amazon.com/s*"
           ],
-          "js": ["ajax.js", "our-brands.js", "content.js"],
+          "js": ["ajax.js", "content.js"],
           "run_at": "document_end"
         }
     ],
