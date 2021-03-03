@@ -188,7 +188,8 @@ function getLink(ele) {
  */
 function getTitle(ele) {
     //console.log("getting title", ele);
-    let header = ele.querySelector("h2, span[class~='a-truncate-full']");
+    //let header = ele.querySelector("h2, span[class~='a-truncate-full']");
+    let header = ele.querySelector("h2");
     if(header) 
         return header.textContent.trim();
 
