@@ -1,7 +1,7 @@
 // Endpoint to send the response from the "our-brands" endpoint for Markup research
 // This happens in submtiData()
 const MRKP_ENDPOINT = "http://localhost:1773";
-
+const MAX_API_PAGES = 5;
 
 // We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
@@ -27,7 +27,7 @@ function onMessage(request, sender, sendResponse) {
     console.log("onMessage request", request);
 
     // reassign the promise in response to a message from background.js saying that the URL has changed.
-    if(request == "url_changed") {
+    if(request === "url_changed") {
         promises[window.location.href] = loadContent();
     }
 
@@ -64,9 +64,8 @@ async function loadContent() {
         for(const p of page_products) {
             if(isAmazonBrand(p, api_results)) {
                 const obj = { title: getTitle(p), asin: getASIN(p), link: getLink(p) };
-                console.log("Overlap", obj);
                 overlap.push(obj);
-                p.style.cssText += 'border:1px dashed red;background-color:rgba(255,0,0,0.5)';
+                stain(obj.asin);
             }
         }
 
@@ -89,10 +88,20 @@ async function loadContent() {
 }
 
 
+/**
+ * 
+ */
+function stain(asin) {
+    document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
+        p.style.cssText += 'border:1px dashed red;background-color:rgba(255,0,0,0.5)';
+    });
+}
 
 
 /**
- * Finds the overlap between the amazon_products and the page_products
+ * Returns true if ele is an "Our Brand" product, which is determined using a few tests.
+ * NOTE: This is where you can add more checks. It should be 
+ * trivial to make this async and throw an "await" in front of the call above.
  */
 function isAmazonBrand(ele, api_results) {
 
@@ -100,10 +109,8 @@ function isAmazonBrand(ele, api_results) {
         return true;
 
     const title = getTitle(ele);
-    if( title.match(/Echo/) 
-        || title.match(/Kindle/)
-        || title.match(/Fire.+tablet/i) 
-        || title.match(/Amazon Basics/))
+    if( title.match(/Echo|Kindle|Amazon Basics/) 
+        || title.match(/Fire.+tablet/i))
         return true;
 
     if(ele.textContent.match(/Featured from our brands/))
@@ -136,10 +143,12 @@ function isInAPIResults(p, api_results) {
  * Returns an array of DOM objects
  */
 function getProductsOnPage() {
-    const products = [];
     // We can't look on the whole page because sometimes that includes the user's shipping cart.
     const results = document.querySelector('[data-component-type="s-search-results"]');
-    return results.querySelectorAll("div[data-asin]");
+    const asindivs = results.querySelectorAll("div[data-asin]");
+    // There are some divs on the page that have a data-asin attribute but it has no value. 
+    // So we have to filter those out. 
+    return [...asindivs].filter( ele => ele.getAttribute("data-asin") );
 }
 
 
@@ -299,7 +308,7 @@ async function getOurBrandsProducts() {
 
         page++;
 
-    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < 5);
+    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < MAX_API_PAGES);
 
     return products;
 }
