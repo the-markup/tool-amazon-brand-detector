@@ -250,7 +250,7 @@ async function getAPIEndpoint() {
 
 /**
  * Gets a list of Amazon-owned products
- * Returns an array of objects like  {"asin": "", "title": "", "link": ""}
+ * Returns an array of DOM elements
  */
 async function getOurBrandsProducts() {
     console.log(`getOurBrandsProducts()`);
@@ -370,7 +370,8 @@ function getProducts(objects) {
             && obj[0] == "dispatch" 
             && obj[1].match(/^data-main-slot:search-result/) 
             && "asin" in obj[2] ) {
-                const ele = parser.parseFromString(obj[2].html, "text/xml").firstChild;
+                const ele = parser.parseFromString(obj[2].html, "text/html").firstChild;
+
                 search_results.push(ele);
         }
     }

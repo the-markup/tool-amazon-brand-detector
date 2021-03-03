@@ -21,7 +21,7 @@ const icons_enabled = {
  * https://developer.chrome.com/docs/extensions/reference/tabs/#event-onActivated
  */
 chrome.tabs.onActivated.addListener(function(activeInfo) {
-    chrome.tabs.getSelected(null, function(tab) {
+    chrome.tabs.query({active: true}, function(tab) {
         updateIcon(tab.url);
     });
 });
@@ -44,6 +44,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
  * @param {string} url 
  */
 function updateIcon(url) {
+    if(!url) return;
     const icons = url.match(/amazon.com\/s/) 
         ? icons_enabled 
         : icons_disabled;
