@@ -196,10 +196,12 @@ function getTitle(ele) {
  * @param {Element} ele 
  */
 function getFeaturedFromOurBrands(ele) {
-    let subhead = ele.querySelector("span").textContent.match(/Featured from our brands/);
-    if(subhead) 
-        console.log(subhead)
-        return true;
+    const subhead = ele.querySelector("span[class~='a-size-mini']"); //why does this fail? [class~='a-size-mini']
+    if(subhead) {
+        if (subhead.textContent.match(/Featured from our brands/)) {
+            return true;
+        }
+    }
     return false;
 }
 
