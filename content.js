@@ -69,7 +69,7 @@ async function loadContent() {
 
         // Which products have the honor of going into the ob_products array?
         for(const p of page_products) {
-            if(first_ob_check(p, amazon_products) || await second_ob_check(p)) {
+            if(p.is_featured_from_our_brands == true || await first_ob_check(p, amazon_products) || await second_ob_check(p)) {
                 ob_products.push(p);
                 
                 // TODO: sometimes this doesn't work.  WHY??
@@ -135,11 +135,12 @@ function getProductsOnPage() {
         products.push({
             "asin": asin, 
             "title": getTitle(ele), 
-            "link": getLink(ele)
+            "link": getLink(ele),
+            "is_featured_from_our_brands": getFeaturedFromOurBrands(ele)
         });
     });
 
-    //console.log('returning all_products', products);
+    console.log('returning all_products', products);
     return products;
 }
 
@@ -183,6 +184,18 @@ function getTitle(ele) {
 }
 
 /**
+ * Returns boolean for span containing certain text
+ * @param {Element} ele 
+ */
+function getFeaturedFromOurBrands(ele) {
+    let subhead = ele.querySelector("span").textContent.match(/Featured from our brands/);
+    if(subhead) 
+        console.log(subhead)
+        return true;
+    return false;
+}
+
+/**
  * Returns a promise that will keep querying for an object until it is found, or
  * until the timeout is up.
  * @param {*} q 
@@ -206,6 +219,4 @@ async function queryWaitFor(q, timeout=2000) {
         find();
     });
 }
-
-
 
