@@ -46,6 +46,17 @@ chrome.runtime.onMessage.addListener(onMessage);
 
 
 
+/**
+ * Print a list of products to the console for debugging purposes
+ * @param {*} title 
+ * @param {*} products 
+ */
+function output_products(title, products) {
+    console.log(`======== ${title} ========`);
+    console.log(products.map(p => {
+        return { title: getTitle(p), asin: getASIN(p), link: getLink(p), dom: p };
+    }));
+}
 
 /**
  * Gets all the data that popup.js needs to render the page.
@@ -60,9 +71,12 @@ async function loadContent() {
     try {
         const api_results = await getOurBrandsProducts();               // DOM elements that represent Our Brands products
         const page_products = getProductsOnPage();                      // DOM elements of all prodiucts on th ecurrent page
-        const overlap = [];                                             // overlap product objects like  {"asin": "", "title": "", "link": ""}
+    
+        output_products('API Results', api_results);
+        output_products('Products on page', page_products);
 
         // Which products have the honor of going into the overlap array?
+        const overlap = [];  // objects like  {"asin": "", "title": "", "link": ""}
         for(const p of page_products) {
             if(isAmazonBrand(p, api_results)) {
                 const obj = { title: getTitle(p), asin: getASIN(p), link: getLink(p) };
@@ -71,8 +85,6 @@ async function loadContent() {
             }
         }
 
-        console.log('amazon_products', api_results.length);
-        console.log('page_products', page_products.length);
         console.log('overlap', overlap.length);
 
         const content = {
@@ -159,6 +171,8 @@ function getProductsOnPage() {
  * @param {*} ele 
  */
 function getASIN(ele) {
+    if(!ele.hasAttribute("data-asin"))
+        ele = ele.querySelector("div[data-asin]");
     return ele.getAttribute("data-asin");
 }
 
