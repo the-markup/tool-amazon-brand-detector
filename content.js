@@ -2,7 +2,7 @@
 // This happens in submtiData()
 const MRKP_ENDPOINT = "http://localhost:1773";
 const MAX_API_PAGES = 5;
-const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics/, /Fire.+tablet/i];
+const TITLE_PATTERNS = [/Echo|Whole Foods Market|365 Everyday Value|Amazon Kitchen|Amazon Exclusive|Amazon Brand|Amazon Basics/, /Fire.+tablet/i];
 
 
 // We want to immediately load content when the content script loads
