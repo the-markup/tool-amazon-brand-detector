@@ -2,7 +2,7 @@
 // This happens in submtiData()
 const MRKP_ENDPOINT = "http://localhost:1773";
 const MAX_API_PAGES = 5;
-const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics/, /Fire.+tablet/i];
+const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics|Amazon Brand/, /Fire.+tablet/i];
 
 
 // We want to immediately load content when the content script loads
@@ -12,7 +12,6 @@ const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics/, /Fire.+tablet/i];
 // that the URL has changed. 
 let promises = { };
 promises[window.location.href] = loadContent()
-
 
 /**
  * Called when a message is received through the chrome runtime
@@ -25,7 +24,7 @@ promises[window.location.href] = loadContent()
  * @param {*} sender 
  * @param {*} sendResponse 
  */
-function onMessage(request, sender, sendResponse) {
+ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("onMessage request", request);
 
     // reassign the promise in response to a message from background.js saying that the URL has changed.
@@ -41,22 +40,9 @@ function onMessage(request, sender, sendResponse) {
     }
 
     return true;
-}
-chrome.runtime.onMessage.addListener(onMessage);
+});
 
 
-
-/**
- * Print a list of products to the console for debugging purposes
- * @param {*} title 
- * @param {*} products 
- */
-function output_products(title, products) {
-    console.log(`======== ${title} ========`);
-    console.log(products.map(p => {
-        return { title: getTitle(p), asin: getASIN(p), link: getLink(p), dom: p };
-    }));
-}
 
 /**
  * Gets all the data that popup.js needs to render the page.
@@ -99,6 +85,20 @@ async function loadContent() {
         console.log(e.stack)
         return {"error": `problem getting content. ${e.message}`};
     }
+}
+
+
+
+/**
+ * Print a list of products to the console for debugging purposes
+ * @param {*} title 
+ * @param {*} products 
+ */
+ function output_products(title, products) {
+    console.log(`======== ${title} ========`);
+    console.log(products.map(p => {
+        return { title: getTitle(p), asin: getASIN(p), link: getLink(p), dom: p };
+    }));
 }
 
 
@@ -150,7 +150,7 @@ function isInAPIResults(p, api_results) {
     return false;
 }
 
-
+//B079PNYJWX
 
 /**
  * Gets all of the products on the current page. 
