@@ -1,7 +1,7 @@
 {
     "name": "Our Brands Extension",
     "description": "Reveal which projects are from Amazon-owned brands.",
-    "version": "0.63",
+    "version": "0.64",
     "manifest_version": 2,
     "content_scripts": [
         {
@@ -31,7 +31,9 @@
         "activeTab"
     ],
     "web_accessible_resources": [
-        "asins.yaml"
+        "asins.yaml",
+        "titles.yaml",
+        "subtitles.yaml"
     ],
     "icons": {
         "16": "/assets/icons/16.png",

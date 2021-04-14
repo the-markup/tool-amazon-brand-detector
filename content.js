@@ -2,7 +2,8 @@
 // This happens in submtiData()
 const MRKP_ENDPOINT = "http://localhost:1773";
 const MAX_API_PAGES = 5;
-const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics|Amazon Brand|Amazon Essentials|WEACZZY/, /Fire.+tablet/i];
+const TITLE_PATTERNS = [];
+const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 
 
@@ -60,12 +61,7 @@ async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
     try {
-        if(KNOWN_ASINS.length == 0) {
-            const asins = await getKnownASINs();
-            console.log(asins);
-            Array.prototype.push.apply(KNOWN_ASINS, asins);
-            console.log("KNOWN_ASINS", KNOWN_ASINS);
-        }
+        await init();
 
         const api_results = await getOurBrandsProducts();     // DOM elements that represent Our Brands products
         const page_products = getProductsOnPage();            // DOM elements of all prodiucts on the current page
@@ -107,17 +103,42 @@ async function loadContent() {
 }
 
 
+
 /**
  * 
- * @returns 
  */
-async function getKnownASINs() {
-    const url = chrome.runtime.getURL("asins.yaml");
-    const str = await get(url);
-    const doc = jsyaml.load(str);
-    return Object.keys(doc);
-}
+var inited = false;
+async function init() {
+    if(inited) return;
 
+    const asins = await loadYAML("asins.yaml");
+    Array.prototype.push.apply(KNOWN_ASINS, Object.keys(asins));
+    //console.log("KNOWN_ASINS", KNOWN_ASINS);
+
+    const subtitles = await loadYAML("subtitles.yaml");
+    Array.prototype.push.apply(SUBTITLE_MATCHES, subtitles);
+    //console.log("SUBTITLE_MATCHES", SUBTITLE_MATCHES);
+
+    const titles = await loadYAML("titles.yaml");
+    titles.forEach(t => TITLE_PATTERNS.push(new RegExp(t, "i")) )
+    //console.log("TITLE_PATTERNS", TITLE_PATTERNS);
+
+    inited = true;
+    return;
+}
+ 
+
+ /**
+  * 
+  * @param {*} filename 
+  * @returns 
+  */
+async function loadYAML(filename) {
+    const url = chrome.runtime.getURL(filename);
+    const str = await get(url);
+    return jsyaml.load(str);
+}
+ 
 
 
 /**
@@ -125,7 +146,7 @@ async function getKnownASINs() {
  * @param {*} title 
  * @param {*} products 
  */
- function output_products(title, products) {
+function output_products(title, products) {
     console.log(`======== ${title} ========`);
     console.log(products.map(p => {
         return { title: getTitle(p), asin: getASIN(p), link: getLink(p), dom: p };
@@ -154,11 +175,14 @@ function isAmazonBrand(ele, api_results) {
         return "api";
 
     const title = getTitle(ele);
-    const subtitle = getSubtitle(ele);
     for(const pattern of TITLE_PATTERNS) {
         if(title.match(pattern)) 
             return "title pattern match";
-        if(subtitle.match(pattern))
+    }
+
+    const subtitle = getSubtitle(ele);
+    for(const str of SUBTITLE_MATCHES) {
+        if(subtitle == str)
             return "subtitle pattern match";
     }
 
