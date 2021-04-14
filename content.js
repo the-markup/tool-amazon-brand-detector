@@ -2,9 +2,9 @@
 // This happens in submtiData()
 const MRKP_ENDPOINT = "http://localhost:1773";
 const MAX_API_PAGES = 5;
-const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics|Amazon Brand/, /Fire.+tablet/i];
-
+const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics|Amazon Brand|Amazon Essentials|WEACZZY/, /Fire.+tablet/i];
 const KNOWN_ASINS = [];
+
 
 // We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
@@ -79,7 +79,12 @@ async function loadContent() {
         for(const p of page_products) {
             const reason = isAmazonBrand(p, api_results);
             if(reason) {
-                const obj = { title: getTitle(p), asin: getASIN(p), link: getLink(p), reason };
+                const obj = { 
+                    title: getTitle(p), 
+                    asin: getASIN(p), 
+                    link: getLink(p), 
+                    reason
+                };
                 overlap.push(obj);
                 stain(obj.asin);
             }
@@ -149,9 +154,12 @@ function isAmazonBrand(ele, api_results) {
         return "api";
 
     const title = getTitle(ele);
+    const subtitle = getSubtitle(ele);
     for(const pattern of TITLE_PATTERNS) {
         if(title.match(pattern)) 
             return "title pattern match";
+        if(subtitle.match(pattern))
+            return "subtitle pattern match";
     }
 
     if(ele.textContent.match(/Featured from our brands/))
@@ -181,7 +189,6 @@ function isInAPIResults(p, api_results) {
     return false;
 }
 
-//B079PNYJWX
 
 /**
  * Gets all of the products on the current page. 
@@ -244,6 +251,18 @@ function getTitle(ele) {
     if(image) 
         return image.getAttribute("alt");
     
+    return "Unknown";
+}
+
+/**
+ * 
+ * @param {*} ele 
+ */
+function getSubtitle(ele) {
+    let header = ele.querySelector("h5");
+    if(header) 
+        return header.textContent.trim();
+
     return "Unknown";
 }
 

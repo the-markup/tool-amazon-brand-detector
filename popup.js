@@ -47,7 +47,7 @@ function onContent(content) {
             html += `<ol>`;
             content.products.forEach(p => {
                 html += '<li>';
-                html += `<a href="${p.link}">${truncate(p.title, 50)}</a>`;
+                html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.reason})`;
                 html += '</li>';
             });
             html += `</ol>`;
