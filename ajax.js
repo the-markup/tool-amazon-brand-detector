@@ -4,7 +4,8 @@ function get(endpoint, headers) {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
         xhr.open("GET", endpoint);
-        headers.split("\n").forEach(line => {
+        
+        if(headers) headers.split("\n").forEach(line => {
             if(!line.trim()) return;
             let parts = line.split(":");
             let name = parts[0].trim();

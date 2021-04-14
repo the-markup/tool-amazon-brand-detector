@@ -4,6 +4,7 @@ const MRKP_ENDPOINT = "http://localhost:1773";
 const MAX_API_PAGES = 5;
 const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics|Amazon Brand/, /Fire.+tablet/i];
 
+const KNOWN_ASINS = [];
 
 // We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
@@ -12,6 +13,10 @@ const TITLE_PATTERNS = [/Echo|Kindle|Amazon Basics|Amazon Brand/, /Fire.+tablet/
 // that the URL has changed. 
 let promises = { };
 promises[window.location.href] = loadContent()
+
+
+
+
 
 /**
  * Called when a message is received through the chrome runtime
@@ -55,17 +60,26 @@ async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
     try {
-        const api_results = await getOurBrandsProducts();               // DOM elements that represent Our Brands products
-        const page_products = getProductsOnPage();                      // DOM elements of all prodiucts on th ecurrent page
+        if(KNOWN_ASINS.length == 0) {
+            const asins = await getKnownASINs();
+            console.log(asins);
+            Array.prototype.push.apply(KNOWN_ASINS, asins);
+            console.log("KNOWN_ASINS", KNOWN_ASINS);
+        }
+
+        const api_results = await getOurBrandsProducts();     // DOM elements that represent Our Brands products
+        const page_products = getProductsOnPage();            // DOM elements of all prodiucts on the current page
     
+        // For debugging purposes...
         output_products('API Results', api_results);
         output_products('Products on page', page_products);
 
         // Which products have the honor of going into the overlap array?
         const overlap = [];  // objects like  {"asin": "", "title": "", "link": ""}
         for(const p of page_products) {
-            if(isAmazonBrand(p, api_results)) {
-                const obj = { title: getTitle(p), asin: getASIN(p), link: getLink(p) };
+            const reason = isAmazonBrand(p, api_results);
+            if(reason) {
+                const obj = { title: getTitle(p), asin: getASIN(p), link: getLink(p), reason };
                 overlap.push(obj);
                 stain(obj.asin);
             }
@@ -85,6 +99,18 @@ async function loadContent() {
         console.log(e.stack)
         return {"error": `problem getting content. ${e.message}`};
     }
+}
+
+
+/**
+ * 
+ * @returns 
+ */
+async function getKnownASINs() {
+    const url = chrome.runtime.getURL("asins.yaml");
+    const str = await get(url);
+    const doc = jsyaml.load(str);
+    return Object.keys(doc);
 }
 
 
@@ -120,18 +146,23 @@ function stain(asin) {
 function isAmazonBrand(ele, api_results) {
 
     if(isInAPIResults(ele, api_results))
-        return true;
+        return "api";
 
     const title = getTitle(ele);
     for(const pattern of TITLE_PATTERNS) {
-        if(title.match(pattern)) return true;
+        if(title.match(pattern)) 
+            return "title pattern match";
     }
 
     if(ele.textContent.match(/Featured from our brands/))
-        return true;
+        return "featured our brands";
+
+    if( KNOWN_ASINS.includes(getASIN(ele)))
+        return "known ASIN";
 
     return false;
 }
+
 
 
 
