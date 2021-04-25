@@ -2,6 +2,15 @@
 Find out which products from a search on Amazon are from brands that are owned by Amazon.
 
 
+# Important Product Files
+
+## asins.yaml
+
+## titles.yaml
+
+## subtitles.yaml
+
+
 # Sample URLs
 
 Original URL:   https://www.amazon.com/s?k=whiskey+glasses&ref=nb_sb_noss

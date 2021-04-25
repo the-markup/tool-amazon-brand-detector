@@ -12,3 +12,7 @@ body.disabled {
     width: 300px;
     height: 40px;
 }
+
+.utility-links{
+    font-size: smaller;
+}

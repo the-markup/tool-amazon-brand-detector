@@ -15,10 +15,6 @@ const KNOWN_ASINS = [];
 let promises = { };
 promises[window.location.href] = loadContent()
 
-
-
-
-
 /**
  * Called when a message is received through the chrome runtime
  * 
@@ -45,6 +41,14 @@ promises[window.location.href] = loadContent()
         promises[window.location.href].then(sendResponse)
     }
 
+    if(request === "clear_storage") {
+        console.log("clearing storage!");
+        chrome.storage.sync.clear();
+    }
+
+    if(request === "log_storage") {
+        chrome.storage.sync.get(null, (obj) => console.log(obj));
+    }
     return true;
 });
 
@@ -62,7 +66,8 @@ async function loadContent() {
 
     try {
         await init();
-
+        
+        // The following arrays will both contain DOM elements like div[data-asin]
         const api_results = await getOurBrandsProducts();     // DOM elements that represent Our Brands products
         const page_products = getProductsOnPage();            // DOM elements of all prodiucts on the current page
     
@@ -71,23 +76,29 @@ async function loadContent() {
         output_products('Products on page', page_products);
 
         // Which products have the honor of going into the overlap array?
-        const overlap = [];  // objects like  {"asin": "", "title": "", "link": ""}
+        const overlap = [];
+        const now = Date.now();
         for(const p of page_products) {
-            const reason = isAmazonBrand(p, api_results);
-            if(reason) {
+            const detection_method = isAmazonBrand(p, api_results);
+            if(detection_method) {
                 const obj = { 
                     title: getTitle(p), 
                     asin: getASIN(p), 
                     link: getLink(p), 
-                    reason
+                    date_seen: now,
+                    detection_method
                 };
+
                 overlap.push(obj);
                 stain(obj.asin);
             }
         }
 
+        await submitToMarkup(overlap);
+
         console.log('overlap', overlap.length);
 
+        // This is what gets parsed by the popup.js to create the content
         const content = {
             "products": overlap, 
             "num_on_page": page_products.length,
@@ -101,6 +112,8 @@ async function loadContent() {
         return {"error": `problem getting content. ${e.message}`};
     }
 }
+
+
 
 
 
@@ -147,8 +160,7 @@ async function loadYAML(filename) {
  * @param {*} products 
  */
 function output_products(title, products) {
-    console.log(`======== ${title} ========`);
-    console.log(products.map(p => {
+    console.log(`======== ${title}`, products.map(p => {
         return { title: getTitle(p), asin: getASIN(p), link: getLink(p), dom: p };
     }));
 }
@@ -378,9 +390,6 @@ async function getOurBrandsProducts() {
         const elapsed = Date.now() - start;
         console.log(`query took ${(elapsed/1000).toFixed(2)} seconds and returned ${response.length} bytes`)
 
-        // This is where the data is posted to the MRKP_ENDPOINT
-        await submitData({"data": response, "query": window.location.href, "endpoint": endpoint.href}); 
-
         // The XHR request returns a list of JSON objects, so let's separate them out into a list.
         const objects = parseAPIResponse(response);
 
@@ -467,15 +476,54 @@ function getProducts(objects) {
 }
 
 
+
+// The storage API is weird to me... 
+// It seems to encourage getting/setting the entire storage object
+// instead of updating particular keys. 
+// https://developer.chrome.com/docs/extensions/reference/storage/
+const storage = {
+    load: async function(key) {
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.get(key, (obj) => chrome.runtime.lastError
+                ? reject(chrome.runtime.lastError)
+                : resolve(obj));
+        });
+    },
+    save: async function(obj) {
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.set(obj, () => chrome.runtime.lastError
+                ? reject(chrome.runtime.lastError)
+                : resolve());
+        });
+    }
+}
+
+
 /**
  * Post some stuff to MRKP_ENDPOINT.  
  * If it fails, don't freak out. Just console.out the error and move on. 
  */
-async function submitData(data) {
+async function submitToMarkup(products) {
     try {
-        await post(MRKP_ENDPOINT, data);
-        console.log(`posted data to ${MRKP_ENDPOINT}`)
+        // Filter out any products that we've seen before (that are in the "seen_asins" array)
+        const store = await storage.load({"seen_asins": []});
+        const data = products.filter(p => !store.seen_asins.includes(p.asin));
+
+        if(data.length > 0) {
+            console.log(`posting data to ${MRKP_ENDPOINT}`, data)
+            await post(MRKP_ENDPOINT, data);
+            
+            // Add the new ASINS to the seen_asins list and save it back to storage.
+            for(const p of data) {
+                store.seen_asins.push( p.asin )
+            }
+            //console.log("store", store);
+            await storage.save(store);
+
+        } else {
+            console.log("No new products to post to the Markup")
+        }
     } catch(e) {
-        console.log(e);
+        console.log("error in submitToMarkup", e);
     }
 }
