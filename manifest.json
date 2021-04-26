@@ -42,5 +42,11 @@
         "32": "/assets/icons/32.png",
         "64": "/assets/icons/64.png",
         "128": "/assets/icons/128.png"
-    }
+    },
+    "browser_specific_settings": {
+        "gecko": {
+          "id": "amazon-brands-detector@amazon.com"
+        }
+      }
+      
 }
