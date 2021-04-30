@@ -533,11 +533,12 @@ async function submitToMarkup(products) {
 
 
 /**
- * 
+ * https://stackoverflow.com/questions/12830649/check-if-chrome-extension-installed-in-unpacked-mode
  * @returns Ask the back end if we're in development mode or not. 
  */
  async function isDev() {
     return new Promise(function (resolve, reject) {
+        //resolve(!('update_url' in chrome.runtime.getManifest())); // Alternative way to check
         chrome.runtime.sendMessage("isDev", resolve);
     });
 }
