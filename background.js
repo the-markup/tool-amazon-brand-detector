@@ -14,6 +14,17 @@ const icons_enabled = {
     "128": "/assets/icons/128.png"
 }
 
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if(request=="isDev") {
+        chrome.management.getSelf(self => {
+            sendResponse(self.installType=="development");
+        });
+    }
+    return true; // VERY IMPORTANT TO RETURN TRUE HERE. Because of asynchronous sendResponse.
+});
+
+
 /**
  * Fires when the active tab in a window changes. 
  * Note that the tab's URL may not be set at the time this event fired, 

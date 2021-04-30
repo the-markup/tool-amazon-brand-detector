@@ -1,12 +1,15 @@
 console.log("popup.js", window.location.href);
 
 
+
+
 /**
  * This kicks things off in popup.js
  * Query for the active tab in the browser and then decide what to do.
  */
 function initialize() {
     console.log("initialize()");
+
 
     // This is needed to open links from popup.html
     window.onclick = function(e) {
@@ -28,7 +31,8 @@ function initialize() {
         //chrome.storage.sync.get(null, (obj) => console.log(obj));
     }
 
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
+
         if(tabs[0].url.match(/amazon.com\/s/)) {
             document.body.className = 'enabled';
             document.getElementById('theContent').innerHTML = '<img src="assets/ajax-loader.gif" />';

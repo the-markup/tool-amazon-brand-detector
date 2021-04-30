@@ -1,11 +1,10 @@
 // Endpoint to send the response from the "our-brands" endpoint for Markup research
 // This happens in submtiData()
-const MRKP_ENDPOINT = "http://localhost:1773";
+
 const MAX_API_PAGES = 5;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
-
 
 // We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
@@ -476,7 +475,6 @@ function getProducts(objects) {
 }
 
 
-
 // The storage API is weird to me... 
 // It seems to encourage getting/setting the entire storage object
 // instead of updating particular keys. 
@@ -498,20 +496,24 @@ const storage = {
     }
 }
 
-
 /**
  * Post some stuff to MRKP_ENDPOINT.  
  * If it fails, don't freak out. Just console.out the error and move on. 
  */
 async function submitToMarkup(products) {
     try {
+        const devMode = await isDev();
+        const endpoint = (devMode)
+            ? "https://asin-collector.editorial-sandbox.themarkup.org/upload"
+            : "https://asin-collector.editorial.themarkup.org/upload";
+    
         // Filter out any products that we've seen before (that are in the "seen_asins" array)
         const store = await storage.load({"seen_asins": []});
         const data = products.filter(p => !store.seen_asins.includes(p.asin));
 
         if(data.length > 0) {
-            console.log(`posting data to ${MRKP_ENDPOINT}`, data)
-            await post(MRKP_ENDPOINT, data);
+            console.log(`posting data to ${endpoint}`, data)
+            await post(endpoint, data);
             
             // Add the new ASINS to the seen_asins list and save it back to storage.
             for(const p of data) {
@@ -526,4 +528,16 @@ async function submitToMarkup(products) {
     } catch(e) {
         console.log("error in submitToMarkup", e);
     }
+}
+
+
+
+/**
+ * 
+ * @returns Ask the back end if we're in development mode or not. 
+ */
+ async function isDev() {
+    return new Promise(function (resolve, reject) {
+        chrome.runtime.sendMessage("isDev", resolve);
+    });
 }
