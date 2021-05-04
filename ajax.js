@@ -1,5 +1,4 @@
 
-
 function get(endpoint, headers) {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
