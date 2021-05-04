@@ -30,10 +30,10 @@ function get(endpoint, headers) {
 
 function post(endpoint, data) {
     return new Promise(function (resolve, reject) {
-        var formData = new FormData();
-        for (const [key, value] of Object.entries(data)) {
-            formData.append(key, value);
-        }
+        // var formData = new FormData();
+        // for (const [key, value] of Object.entries(data)) {
+        //     formData.append(key, value);
+        // }
         
         var xhr = new XMLHttpRequest();
         //console.log(`opening POST connection to ${endpoint}`);
@@ -42,6 +42,7 @@ function post(endpoint, data) {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == XMLHttpRequest.DONE) { 
                 var status = xhr.status;
+                //console.log("xhr.status", xhr.status, "xhr.responseText", xhr.responseText);
                 if (status === 0 || (status >= 200 && status < 400)) {
                     resolve(xhr.responseText);
                 } else {
@@ -49,7 +50,8 @@ function post(endpoint, data) {
                 }
             }
         };
-        xhr.send(formData);
+        //xhr.send(formData);
+        xhr.send(data);
     });
 }
 

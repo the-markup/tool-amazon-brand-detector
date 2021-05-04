@@ -501,6 +501,7 @@ const storage = {
  * If it fails, don't freak out. Just console.out the error and move on. 
  */
 async function submitToMarkup(products) {
+    let response = null;
     try {
         const devMode = await isDev();
         const endpoint = (devMode)
@@ -513,7 +514,7 @@ async function submitToMarkup(products) {
 
         if(data.length > 0) {
             console.log(`posting data to ${endpoint}`, data)
-            await post(endpoint, data);
+            response = await post(endpoint, JSON.stringify(data));
             
             // Add the new ASINS to the seen_asins list and save it back to storage.
             for(const p of data) {
@@ -526,7 +527,7 @@ async function submitToMarkup(products) {
             console.log("No new products to post to the Markup")
         }
     } catch(e) {
-        console.log("error in submitToMarkup", e);
+        console.log("error in submitToMarkup", e, response);
     }
 }
 

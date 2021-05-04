@@ -1,7 +1,7 @@
 {
     "name": "Our Brands Extension",
     "description": "Reveal which projects are from Amazon-owned brands.",
-    "version": "0.66",
+    "version": "0.67",
     "manifest_version": 2,
     "content_scripts": [
         {
