@@ -170,7 +170,7 @@ function output_products(title, products) {
  */
 function stain(asin) {
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
-        p.style.cssText += 'border:1px dashed red; background-color:#ff9900;';
+        p.style.cssText += 'border:1px dashed #fc345c; background-color:#ff990095;';
     });
 }
 
