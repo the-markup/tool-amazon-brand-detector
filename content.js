@@ -204,7 +204,6 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
     if( KNOWN_ASINS.includes(getASIN(ele)))
         return "known ASIN";
         
-    console.log(carousel_asins);
     if( carousel_asins.includes(getASIN(ele)))
         return "Our Brands Carousel";
 
