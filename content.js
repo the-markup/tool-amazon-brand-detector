@@ -69,7 +69,8 @@ async function loadContent() {
         // The following arrays will both contain DOM elements like div[data-asin]
         const api_results = await getOurBrandsProducts();     // DOM elements that represent Our Brands products
         const page_products = getProductsOnPage();            // DOM elements of all prodiucts on the current page
-    
+        const carousel_asins = await getCarouselProducts();   // Array of ASIN strings from products in Our Brands carousel
+
         // For debugging purposes...
         output_products('API Results', api_results);
         output_products('Products on page', page_products);
@@ -78,7 +79,7 @@ async function loadContent() {
         const overlap = [];
         const now = Date.now();
         for(const p of page_products) {
-            const detection_method = isAmazonBrand(p, api_results);
+            const detection_method = isAmazonBrand(p, api_results, carousel_asins);
             if(detection_method) {
                 const obj = { 
                     title: getTitle(p), 
@@ -180,7 +181,7 @@ function stain(asin) {
  * NOTE: This is where you can add more checks. 
  * It should be trivial to make this async and throw an "await" in front of the call above.
  */
-function isAmazonBrand(ele, api_results) {
+function isAmazonBrand(ele, api_results, carousel_asins) {
 
     if(isInAPIResults(ele, api_results))
         return "api";
@@ -202,6 +203,9 @@ function isAmazonBrand(ele, api_results) {
 
     if( KNOWN_ASINS.includes(getASIN(ele)))
         return "known ASIN";
+        
+    if( carousel_asins.includes(getASIN(ele)))
+        return "Our Brands Carousel";
 
     return false;
 }
@@ -345,6 +349,25 @@ async function getAPIEndpoint() {
         //url.searchParams.set("dc", "");
         return url.href;
     }
+}
+
+/**
+ * Gets a list of ASINs in featured from our brands carousel
+ * Returns an array of ASINs
+ */
+async function getCarouselProducts() {
+    console.log(`getCarouselProducts()`);
+    var carousel_asins = []
+    const items = document.evaluate(
+        `.//div[@data-asin and ./ancestor::*[contains(@cel_widget_id, "MAIN-FEATURED_ASINS_LIST")]
+        //span[contains(text(), "from our brands") or contains(text(), "Amazon Device")]]`, 
+        document, null, XPathResult.ANY_TYPE, null);
+    while (item = items.iterateNext()) {
+        var asin = item.getAttribute('data-asin')
+        carousel_asins.push(asin);
+    };
+    return carousel_asins
+
 }
 
 /**
