@@ -74,6 +74,8 @@ async function loadContent() {
         // For debugging purposes...
         output_products('API Results', api_results);
         output_products('Products on page', page_products);
+        
+        const page_height = document.body.scrollHeight;
 
         // Which products have the honor of going into the overlap array?
         const overlap = [];
@@ -85,6 +87,10 @@ async function loadContent() {
                     title: getTitle(p), 
                     asin: getASIN(p), 
                     link: getLink(p), 
+                    height: getHeight(p),
+                    normalized_height: getHeight(p) / page_height,
+                    page_height: page_height,
+                    image_src: getImage(p),
                     date_seen: now,
                     detection_method
                 };
@@ -105,6 +111,7 @@ async function loadContent() {
         };
 
         console.log("returning content", content)
+        console.log(JSON.stringify(overlap));
         return content;
 
     } catch(e) {
@@ -182,7 +189,8 @@ function stain(asin) {
  * It should be trivial to make this async and throw an "await" in front of the call above.
  */
 function isAmazonBrand(ele, api_results, carousel_asins) {
-
+    if(ele.textContent.match(/Featured from our brands/))
+        return "featured our brands";
     if(isInAPIResults(ele, api_results))
         return "api";
 
@@ -197,9 +205,6 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
         if(subtitle == str)
             return "subtitle pattern match";
     }
-
-    if(ele.textContent.match(/Featured from our brands/))
-        return "featured our brands";
 
     if( KNOWN_ASINS.includes(getASIN(ele)))
         return "known ASIN";
@@ -294,7 +299,32 @@ function getTitle(ele) {
 }
 
 /**
+ * Gets the product distance from the top from a single ASIN div element.
+ * @param {Element} ele 
+ */
+function getHeight(ele) {
+    let height = ele.getBoundingClientRect().top;
+    if(height) 
+        return height;
+
+    return "Unknown";
+}
+
+/**
+ * Gets the product image from a single ASIN div element.
+ * @param {Element} ele 
+ */
+function getImage(ele) {    
+    let image = ele.querySelector("img");
+    if(image) 
+        return image.getAttribute("src");
+    
+    return "Unknown";
+}
+
+/**
  * 
+ * Gets the subtitle of a product. This is used to text-match known brand names.
  * @param {*} ele 
  */
 function getSubtitle(ele) {
