@@ -74,9 +74,12 @@ function onContent(content) {
             content.products.forEach(p => {
                 html += '<li>';
                 html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})`;
+                html +=  `<img src="${p.image_src}"/>`
                 html += '</li>';
             });
             html += '</ol>';
+
+
         } else {
             html += '<h2>There are no Amazon brands on this page</h2>';
         }

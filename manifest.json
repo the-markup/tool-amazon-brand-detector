@@ -6,7 +6,7 @@
     "content_scripts": [
         {
           "matches": [
-            "https://www.amazon.com/s?*"
+            "https://*.amazon.com/s?*"
           ],
           "js": ["ajax.js", "content.js", "js-yaml.min.js"],
           "run_at": "document_end"

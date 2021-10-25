@@ -579,7 +579,7 @@ async function submitToMarkup(products) {
             console.log("No new products to post to the Markup")
         }
     } catch(e) {
-        console.log("error in submitToMarkup", e, response);
+        console.log("error in submitToMarkup", e);
     }
 }
 
