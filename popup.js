@@ -33,13 +33,15 @@ function initialize() {
 
     chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 
-        if(tabs[0].url.match(/amazon.com\/s/)) {
+        if(tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in)\/s/)) {
+            console.log("Seach page")
             document.body.className = 'enabled';
             document.getElementById('theContent').innerHTML = '<img src="assets/ajax-loader.gif" />';
     
             // Here's where we send the "get_content" message that is received by content.js
             chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
         } else {
+            console.log("not search page")
             document.body.className = 'disabled';
             document.getElementById('theContent').innerHTML = 'Not an Amazon search page';
         }
@@ -73,8 +75,8 @@ function onContent(content) {
             html += `<ol>`;
             content.products.forEach(p => {
                 html += '<li>';
-                html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})`;
-                html +=  `<img src="${p.image_src}"/>`
+                html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})<br>`;
+                html +=  `<img src="${p.image_src}" style="width:100px;"/>`
                 html += '</li>';
             });
             html += '</ol>';

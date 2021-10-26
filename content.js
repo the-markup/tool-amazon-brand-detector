@@ -1,10 +1,62 @@
 // Endpoint to send the response from the "our-brands" endpoint for Markup research
 // This happens in submtiData()
 
+const DEV=1;
 const MAX_API_PAGES = 5;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
+const MARKET2APIPARAMS = {
+    "www.amazon.com": {
+        "api": {
+            "ref": "sr_nr_p_n_feature_forty-seven_browse-bin_1",
+            "rh": "p_n_feature_forty-seven_browse-bin:21180942011"
+        }
+    },
+    "www.amazon.co.jp": {
+        "api": {
+            "ref": "sr_nr_p_n_feature_forty-one_browse-bin_1",
+            "rh": "p_n_feature_forty-one_browse-bin:8101514051"
+        }
+    },
+    'www.amazon.co.uk': {
+        "api": {
+            "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
+            "rh": "p_n_feature_fifty_browse-bin:15688542031"
+        }
+    },
+    "www.amazon.de": {
+        "api": {
+            "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
+            "rh": "p_n_feature_fifty_browse-bin:15763830031"
+        }
+    },
+    "www.amazon.ca": {
+        "api": {
+            "ref": "sr_nr_p_n_feature_forty_browse-bin_1",
+            "rh": "p_n_feature_forty_browse-bin:18581120011"
+        }
+    },
+    "www.amazon.com.mx": {
+        "api": {
+            "ref": "sr_nr_p_n_feature_forty-one_browse-bin_1",
+            "rh": "p_n_feature_forty-one_browse-bin:18581144011",
+        },
+    },
+    "www.amazon.it": {
+        "api": {
+            "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
+            "rh": "p_n_feature_fifty_browse-bin:15765585031",
+        },
+    },
+    "www.amazon.in": {
+        "api": {
+            "ref": "sr_nr_p_n_is_private_label_1",
+            "rh": "p_n_is_private_label:16184648031",
+        },
+    }
+}
+
 
 // We want to immediately load content when the content script loads
 // Keep the promise returned from loadContent
@@ -100,7 +152,8 @@ async function loadContent() {
             }
         }
 
-        await submitToMarkup(overlap);
+        // Add this functionality later.
+        // await submitToMarkup(overlap);
 
         console.log('overlap', overlap.length);
 
@@ -178,8 +231,11 @@ function output_products(title, products) {
  */
 function stain(asin) {
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
-        p.style.cssText += 'border:1px dashed #fc345c; background-color:#ff990095;';
+        p.style.cssText += 'border:1px solid #ff990095; background:#ff990095; opacity:0.9; transition:all 0.5s linear; z-index:100;';
     });
+    // document.querySelectorAll(`div[data-asin='${asin}'] img[class="s-image"]`).forEach( p => {
+    //     p.style.cssText += 'filter:opacity(25%); mix-blend-mode: multiply!important; z-index:1;';
+    // });
 }
 
 
@@ -189,7 +245,7 @@ function stain(asin) {
  * It should be trivial to make this async and throw an "await" in front of the call above.
  */
 function isAmazonBrand(ele, api_results, carousel_asins) {
-    if(ele.textContent.match(/Featured from our brands/))
+    if(ele.textContent.match(/(Featured from our brands|Präsentiert von unseren Marken|In evidenza dai nostri marchi)/))
         return "featured our brands";
     if(isInAPIResults(ele, api_results))
         return "api";
@@ -342,7 +398,7 @@ function getSubtitle(ele) {
  * @param {*} q 
  * @param {*} timeout 
  */
-async function queryWaitFor(q, timeout=2000) {
+async function queryWaitFor(q, timeout=3000) {
     return new Promise(function (resolve, reject) {
         function find() {
             ele = document.querySelector(q);
@@ -367,16 +423,42 @@ async function queryWaitFor(q, timeout=2000) {
  * If not, it tries to construct it manually. 
  */
 async function getAPIEndpoint() {
+    var host = window.location.host;
+    console.log(host)
     try {
-        const ele = await queryWaitFor('[aria-label="Our Brands"] a');
+        const ele = await queryWaitFor('[aria-label="Our Brands"] a, [aria-label="Unsere Marken"] a, [aria-label="Nuestras Marcas"] a, [aria-label="I nostri marchi"] a, [aria-label="Made for Amazon"] a');
         console.log(`Using Our Brands link to construct api endpoint`);
-        return ele.getAttribute("href").replace("/s?", "/s/query?dc&");
+        var url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
+        console.log(url)
+        // save to storage
+        const urlParams = new URLSearchParams(url);
+        for (arg of ['rh', 'ref']) {
+            if (urlParams.has('arg')) {
+                MARKET2APIPARAMS[host][arg] = urlParams.get(arg).split(',').at(-1);
+                await storage.save(MARKET2APIPARAMS);
+            }
+        }
+        return url;
+
     } catch(e) {
+        console.log(e)
         console.log(`Didn't find Our Brands link. Using fallback method.`);
-        var url = new URL(window.location.href.replace("/s?", "/s/query?")); 
-        url.searchParams.set("ref", "sr_nr_p_n_feature_forty-seven_browse-bin_1");
-        url.searchParams.set("rh", "p_n_feature_forty-seven_browse-bin:21180942011");
-        //url.searchParams.set("dc", "");
+        var url = new URL(window.location.href.replace("/s?", "/s/query?"));
+        
+        // use hard coded API
+        if (MARKET2APIPARAMS.hasOwnProperty(host)) {
+            apiParams = MARKET2APIPARAMS[host]["api"];
+            console.log(apiParams)
+            for (const [key, value] of Object.entries(apiParams)) {
+                console.log(`${key}: ${value}`);
+                url.searchParams.set(key, value);
+            }
+        }
+
+        else {
+            console.log("No API params hard coded.")
+        }
+        console.log(url.href);
         return url.href;
     }
 }
@@ -410,7 +492,11 @@ async function getOurBrandsProducts() {
     // Construct the endpoint for the request
     const api_url = await getAPIEndpoint();
 
-    let endpoint = new URL(api_url, "https://www.amazon.com"); 
+    // get base URL so smile.amazon.com works.
+    var getUrl = window.location;
+    var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+
+    let endpoint = new URL(api_url, baseUrl); 
     let page = 1;
     let products = [];
     let metadata = null;
