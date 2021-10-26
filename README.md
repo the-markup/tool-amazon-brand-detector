@@ -10,6 +10,13 @@ Find out which products from a search on Amazon are from brands that are owned b
 
 ## subtitles.yaml
 
+# Test queries
+Batteries
+
+Bath salts
+
+Bubble bath
+
 
 # Sample URLs
 
