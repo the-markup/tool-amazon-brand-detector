@@ -1,0 +1,46 @@
+{
+    "www.amazon.com": {
+        "ref": "sr_nr_p_n_feature_forty-seven_browse-bin_1",
+        "rh": "p_n_feature_forty-seven_browse-bin:21180942011"
+    },
+    "www.amazon.co.jp": {
+        "ref": "sr_nr_p_n_feature_forty-one_browse-bin_1",
+        "rh": "p_n_feature_forty-one_browse-bin:8101514051"
+    },
+    "www.amazon.co.uk": {
+        "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
+        "rh": "p_n_feature_fifty_browse-bin:15688542031"
+    },
+    "www.amazon.de": {
+        "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
+        "rh": "p_n_feature_fifty_browse-bin:15763830031"
+    },
+    "www.amazon.ca": {
+        "ref": "sr_nr_p_n_feature_forty_browse-bin_1",
+        "rh": "p_n_feature_forty_browse-bin:18581120011"
+    },
+    "www.amazon.com.mx": {
+        "ref": "sr_nr_p_n_feature_forty-one_browse-bin_1",
+        "rh": "p_n_feature_forty-one_browse-bin:18581144011"
+    },
+    "www.amazon.it": {
+        "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
+        "rh": "p_n_feature_fifty_browse-bin:15765585031"
+    },
+    "www.amazon.in": {
+        "ref": "sr_nr_p_n_is_private_label_1",
+        "rh": "p_n_is_private_label:3A16184648031"
+    },
+    "www.amazon.com.au": {
+        "ref": "sr_nr_p_n_feature_forty-seven_browse-bin_1",
+        "rh": "p_n_feature_forty-seven_browse-bin:8172769051"
+    },
+    "www.amazon.fr": {
+        "ref": "sr_nr_p_n_format_browse-bin_1",
+        "rh": "p_n_format_browse-bin:15458314031"
+    },
+    "www.amazon.es": {
+        "ref": "sr_nr_p_n_format_browse-bin_1",
+        "rh": "p_n_format_browse-bin:15458317031"
+    }
+}

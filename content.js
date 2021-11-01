@@ -1,61 +1,10 @@
-// Endpoint to send the response from the "our-brands" endpoint for Markup research
-// This happens in submtiData()
-
-const DEV=1;
-const MAX_API_PAGES = 5;
+const MAX_API_PAGES = 4;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
-const MARKET2APIPARAMS = {
-    "www.amazon.com": {
-        "api": {
-            "ref": "sr_nr_p_n_feature_forty-seven_browse-bin_1",
-            "rh": "p_n_feature_forty-seven_browse-bin:21180942011"
-        }
-    },
-    "www.amazon.co.jp": {
-        "api": {
-            "ref": "sr_nr_p_n_feature_forty-one_browse-bin_1",
-            "rh": "p_n_feature_forty-one_browse-bin:8101514051"
-        }
-    },
-    'www.amazon.co.uk': {
-        "api": {
-            "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
-            "rh": "p_n_feature_fifty_browse-bin:15688542031"
-        }
-    },
-    "www.amazon.de": {
-        "api": {
-            "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
-            "rh": "p_n_feature_fifty_browse-bin:15763830031"
-        }
-    },
-    "www.amazon.ca": {
-        "api": {
-            "ref": "sr_nr_p_n_feature_forty_browse-bin_1",
-            "rh": "p_n_feature_forty_browse-bin:18581120011"
-        }
-    },
-    "www.amazon.com.mx": {
-        "api": {
-            "ref": "sr_nr_p_n_feature_forty-one_browse-bin_1",
-            "rh": "p_n_feature_forty-one_browse-bin:18581144011",
-        },
-    },
-    "www.amazon.it": {
-        "api": {
-            "ref": "sr_nr_p_n_feature_fifty_browse-bin_1",
-            "rh": "p_n_feature_fifty_browse-bin:15765585031",
-        },
-    },
-    "www.amazon.in": {
-        "api": {
-            "ref": "sr_nr_p_n_is_private_label_1",
-            "rh": "p_n_is_private_label:16184648031",
-        },
-    }
-}
+const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+const PUBLIC_FILE = "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json";
+var MARKET2APIPARAMS = {};
 
 
 // We want to immediately load content when the content script loads
@@ -65,6 +14,54 @@ const MARKET2APIPARAMS = {
 // that the URL has changed. 
 let promises = { };
 promises[window.location.href] = loadContent()
+
+// The storage API is weird to me... 
+// It seems to encourage getting/setting the entire storage object
+// instead of updating particular keys. 
+// https://developer.chrome.com/docs/extensions/reference/storage/
+const storage = {
+    load: async function(key) {
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.get(key, (obj) => chrome.runtime.lastError
+                ? reject(chrome.runtime.lastError)
+                : resolve(obj));
+        });
+    },
+    save: async function(obj) {
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.set(obj, () => chrome.runtime.lastError
+                ? reject(chrome.runtime.lastError)
+                : resolve());
+        });
+    }
+}
+
+/**
+ * Load API params from the cloud once daily
+ */ 
+async function updateApiParams() {
+    console.log("getting latest params from the WWW");
+    let headers = 'Cache-Control: no-cache';
+    MARKET2APIPARAMS = JSON.parse(await get(PUBLIC_FILE, headers));
+    // await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
+    // await storage.save({"lastChecked": TODAY});
+    console.log(MARKET2APIPARAMS);
+}
+
+async function getApiParams() {
+    let lastChecked = await storage.load("lastChecked");
+    lastChecked = lastChecked["lastChecked"];
+    if (lastChecked !== TODAY) {
+        // update old keys
+        await updateApiParams();
+    } else {
+        // get today's keys from storage
+        console.log("loading todays params from storage")
+        // MARKET2APIPARAMS = await storage.load("MARKET2APIPARAMS");
+        // MARKET2APIPARAMS = MARKET2APIPARAMS["MARKET2APIPARAMS"];
+    }
+}
+getApiParams();
 
 /**
  * Called when a message is received through the chrome runtime
@@ -102,7 +99,6 @@ promises[window.location.href] = loadContent()
     }
     return true;
 });
-
 
 
 /**
@@ -164,7 +160,7 @@ async function loadContent() {
         };
 
         console.log("returning content", content)
-        console.log(JSON.stringify(overlap));
+        // console.log(JSON.stringify(overlap));
         return content;
 
     } catch(e) {
@@ -172,9 +168,6 @@ async function loadContent() {
         return {"error": `problem getting content. ${e.message}`};
     }
 }
-
-
-
 
 
 /**
@@ -233,9 +226,6 @@ function stain(asin) {
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
         p.style.cssText += 'border:1px solid #ff990095; background:#ff990095; opacity:0.9; transition:all 0.5s linear; z-index:100;';
     });
-    // document.querySelectorAll(`div[data-asin='${asin}'] img[class="s-image"]`).forEach( p => {
-    //     p.style.cssText += 'filter:opacity(25%); mix-blend-mode: multiply!important; z-index:1;';
-    // });
 }
 
 
@@ -245,7 +235,7 @@ function stain(asin) {
  * It should be trivial to make this async and throw an "await" in front of the call above.
  */
 function isAmazonBrand(ele, api_results, carousel_asins) {
-    if(ele.textContent.match(/(Featured from our brands|Präsentiert von unseren Marken|In evidenza dai nostri marchi)/))
+    if(ele.textContent.match(/(Featured from our brands|Präsentiert von unseren Marken|In evidenza dai nostri marchi|Suggestions parmi nos marques|Destacado de nuestras marcas)/))
         return "featured our brands";
     if(isInAPIResults(ele, api_results))
         return "api";
@@ -260,6 +250,8 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
     for(const str of SUBTITLE_MATCHES) {
         if(subtitle == str)
             return "subtitle pattern match";
+        else if (subtitle.match("Amazon Brand"))
+            return "subtitle pattern match";
     }
 
     if( KNOWN_ASINS.includes(getASIN(ele)))
@@ -270,8 +262,6 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
 
     return false;
 }
-
-
 
 
 /**
@@ -423,43 +413,44 @@ async function queryWaitFor(q, timeout=3000) {
  * If not, it tries to construct it manually. 
  */
 async function getAPIEndpoint() {
-    var host = window.location.host;
+    var host = window.location.host.replace('smile.', 'www.');
     console.log(host)
     try {
-        const ele = await queryWaitFor('[aria-label="Our Brands"] a, [aria-label="Unsere Marken"] a, [aria-label="Nuestras Marcas"] a, [aria-label="I nostri marchi"] a, [aria-label="Made for Amazon"] a');
+        // API params are on the page.
+        const ele = await queryWaitFor('[aria-label="Our Brands"] a, [aria-label="Unsere Marken"] a, [aria-label="Nuestras Marcas"] a, [aria-label="Made for Amazon"] a, [aria-label="Nos marques"] a, [aria-label="Nuestras marcas"] a, [aria-label="I nostri brand"] a');
         console.log(`Using Our Brands link to construct api endpoint`);
         var url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
-        console.log(url)
-        // save to storage
         const urlParams = new URLSearchParams(url);
-        for (arg of ['rh', 'ref']) {
-            if (urlParams.has('arg')) {
-                MARKET2APIPARAMS[host][arg] = urlParams.get(arg).split(',').at(-1);
-                await storage.save(MARKET2APIPARAMS);
-            }
-        }
+        
+        // for (arg of ['ref', 'rh']) {
+        //     if (urlParams.has(arg)) {
+        //         let val = urlParams.get(arg).split(',').pop()
+        //         MARKET2APIPARAMS[host][arg] = val;
+        //         console.log(`${arg}: ${val}`);
+        //     }
+        // }
+        // console.log("Saving most up to date API params.");
+        // await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
         return url;
 
     } catch(e) {
         console.log(e)
+        // Construct API based on dictionary and current link.
         console.log(`Didn't find Our Brands link. Using fallback method.`);
         var url = new URL(window.location.href.replace("/s?", "/s/query?"));
         
-        // use hard coded API
         if (MARKET2APIPARAMS.hasOwnProperty(host)) {
-            apiParams = MARKET2APIPARAMS[host]["api"];
-            console.log(apiParams)
+            apiParams = MARKET2APIPARAMS[host];
             for (const [key, value] of Object.entries(apiParams)) {
                 console.log(`${key}: ${value}`);
                 url.searchParams.set(key, value);
             }
+            console.log(url.href);
+            return url.href;
+        } else {
+            console.log(host + " is a top-level domain, or Market that we don't have data on.");
+            await updateApiParams();
         }
-
-        else {
-            console.log("No API params hard coded.")
-        }
-        console.log(url.href);
-        return url.href;
     }
 }
 
@@ -614,26 +605,7 @@ function getProducts(objects) {
 }
 
 
-// The storage API is weird to me... 
-// It seems to encourage getting/setting the entire storage object
-// instead of updating particular keys. 
-// https://developer.chrome.com/docs/extensions/reference/storage/
-const storage = {
-    load: async function(key) {
-        return new Promise(function (resolve, reject) {
-            chrome.storage.sync.get(key, (obj) => chrome.runtime.lastError
-                ? reject(chrome.runtime.lastError)
-                : resolve(obj));
-        });
-    },
-    save: async function(obj) {
-        return new Promise(function (resolve, reject) {
-            chrome.storage.sync.set(obj, () => chrome.runtime.lastError
-                ? reject(chrome.runtime.lastError)
-                : resolve());
-        });
-    }
-}
+
 
 /**
  * Post some stuff to MRKP_ENDPOINT.  

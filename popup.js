@@ -33,7 +33,7 @@ function initialize() {
 
     chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 
-        if(tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in)\/s/)) {
+        if(tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)) {
             console.log("Seach page")
             document.body.className = 'enabled';
             document.getElementById('theContent').innerHTML = '<img src="assets/ajax-loader.gif" />';
@@ -70,7 +70,7 @@ function onContent(content) {
             html = '<h2>Error</h2>';
             html += content.error;
         } else if(content.products.length > 0) {
-            html = '<h2>Amazon Brands</h2>';
+            html = '<h2>Amazon Brand Buster</h2>';
             html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
             html += `<ol>`;
             content.products.forEach(p => {
