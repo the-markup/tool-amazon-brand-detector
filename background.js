@@ -24,7 +24,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // VERY IMPORTANT TO RETURN TRUE HERE. Because of asynchronous sendResponse.
 });
 
-
 /**
  * Fires when the active tab in a window changes. 
  * Note that the tab's URL may not be set at the time this event fired, 
