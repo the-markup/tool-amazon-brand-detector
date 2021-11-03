@@ -36,16 +36,20 @@ const storage = {
     }
 }
 
+
 /**
  * Load API params from the cloud once daily
  */ 
 async function updateApiParams() {
     console.log("getting latest params from the WWW");
     let headers = 'Cache-Control: no-cache';
-    MARKET2APIPARAMS = JSON.parse(await get(PUBLIC_FILE, headers));
-    // await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
-    // await storage.save({"lastChecked": TODAY});
+    let resp = await get(PUBLIC_FILE, headers)
+    console.log(resp);
+    MARKET2APIPARAMS = JSON.parse(resp);
     console.log(MARKET2APIPARAMS);
+    await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
+    await storage.save({"lastChecked": TODAY});
+    // console.log(MARKET2APIPARAMS);
 }
 
 async function getApiParams() {
@@ -57,8 +61,8 @@ async function getApiParams() {
     } else {
         // get today's keys from storage
         console.log("loading todays params from storage")
-        // MARKET2APIPARAMS = await storage.load("MARKET2APIPARAMS");
-        // MARKET2APIPARAMS = MARKET2APIPARAMS["MARKET2APIPARAMS"];
+        MARKET2APIPARAMS = await storage.load("MARKET2APIPARAMS");
+        MARKET2APIPARAMS = MARKET2APIPARAMS["MARKET2APIPARAMS"];
     }
 }
 getApiParams();
@@ -111,7 +115,7 @@ getApiParams();
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
-    try {
+    // try {
         await init();
         
         // The following arrays will both contain DOM elements like div[data-asin]
@@ -163,10 +167,10 @@ async function loadContent() {
         // console.log(JSON.stringify(overlap));
         return content;
 
-    } catch(e) {
-        console.log(e.stack)
-        return {"error": `problem getting content. ${e.message}`};
-    }
+    // } catch(e) {
+    //     console.log(e.stack)
+    //     return {"error": `problem getting content. ${e.message}`};
+    // }
 }
 
 
@@ -220,14 +224,23 @@ function output_products(title, products) {
 
 
 /**
- * 
+ * For a given ASIN, stains the product listing box.
+ * Additional selectors are for UI elements like colors of clothing
+ * and whitespace for badges
  */
 function stain(asin) {
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
-        p.style.cssText += 'border:1px solid #ff990095; background:#ff990095; opacity:0.9; transition:all 0.5s linear; z-index:100;';
+        p.style.cssText += 'background:#ff990095; transition:all 0.5s linear; opacity: 1 !important;';
+    });
+
+    document.querySelectorAll(`div[data-asin='${asin}'] div.s-color-swatch-container, div[data-asin='${asin}'] div.s-grid-status-badge-container-dark, div[data-asin='${asin}'] div.s-image-elevated-grid-grey-overlay`).forEach( p => {
+        p.style.cssText += 'background-color: transparent !important;';
+    });
+
+    document.querySelectorAll(`div[data-asin='${asin}'] img.s-image`).forEach( p => {
+            p.style.cssText += 'border: 4px solid #ff990095 !important;';
     });
 }
-
 
 /**
  * Returns true if ele is an "Our Brand" product, which is determined using a few tests.
@@ -438,7 +451,7 @@ async function getAPIEndpoint() {
         // Construct API based on dictionary and current link.
         console.log(`Didn't find Our Brands link. Using fallback method.`);
         var url = new URL(window.location.href.replace("/s?", "/s/query?"));
-        
+        console.log(MARKET2APIPARAMS);
         if (MARKET2APIPARAMS.hasOwnProperty(host)) {
             apiParams = MARKET2APIPARAMS[host];
             for (const [key, value] of Object.entries(apiParams)) {
@@ -607,39 +620,39 @@ function getProducts(objects) {
 
 
 
-/**
- * Post some stuff to MRKP_ENDPOINT.  
- * If it fails, don't freak out. Just console.out the error and move on. 
- */
-async function submitToMarkup(products) {
-    try {
-        const devMode = await isDev();
-        const endpoint = (devMode)
-            ? "https://asin-collector.editorial-sandbox.themarkup.org/upload"
-            : "https://asin-collector.editorial.themarkup.org/upload";
+// /**
+//  * Post some stuff to MRKP_ENDPOINT.  
+//  * If it fails, don't freak out. Just console.out the error and move on. 
+//  */
+// async function submitToMarkup(products) {
+//     try {
+//         const devMode = await isDev();
+//         const endpoint = (devMode)
+//             ? "https://asin-collector.editorial-sandbox.themarkup.org/upload"
+//             : "https://asin-collector.editorial.themarkup.org/upload";
     
-        // Filter out any products that we've seen before (that are in the "seen_asins" array)
-        const store = await storage.load({"seen_asins": []});
-        const data = products.filter(p => !store.seen_asins.includes(p.asin));
+//         // Filter out any products that we've seen before (that are in the "seen_asins" array)
+//         const store = await storage.load({"seen_asins": []});
+//         const data = products.filter(p => !store.seen_asins.includes(p.asin));
 
-        if(data.length > 0) {
-            console.log(`posting data to ${endpoint}`, data)
-            await post(endpoint, JSON.stringify(data));
+//         if(data.length > 0) {
+//             console.log(`posting data to ${endpoint}`, data)
+//             await post(endpoint, JSON.stringify(data));
             
-            // Add the new ASINS to the seen_asins list and save it back to storage.
-            for(const p of data) {
-                store.seen_asins.push( p.asin )
-            }
-            //console.log("store", store);
-            await storage.save(store);
+//             // Add the new ASINS to the seen_asins list and save it back to storage.
+//             for(const p of data) {
+//                 store.seen_asins.push( p.asin )
+//             }
+//             //console.log("store", store);
+//             await storage.save(store);
 
-        } else {
-            console.log("No new products to post to the Markup")
-        }
-    } catch(e) {
-        console.log("error in submitToMarkup", e);
-    }
-}
+//         } else {
+//             console.log("No new products to post to the Markup")
+//         }
+//     } catch(e) {
+//         console.log("error in submitToMarkup", e);
+//     }
+// }
 
 
 

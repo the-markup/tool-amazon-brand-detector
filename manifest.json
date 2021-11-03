@@ -42,7 +42,8 @@
     "permissions": [
         "tabs",
         "activeTab",
-        "storage"
+        "storage",
+        "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json"
     ],
     "web_accessible_resources": [
         "asins.yaml",
