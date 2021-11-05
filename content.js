@@ -1,4 +1,4 @@
-const MAX_API_PAGES = 4;
+const MAX_API_PAGES = 3;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
@@ -65,7 +65,6 @@ async function getApiParams() {
         MARKET2APIPARAMS = MARKET2APIPARAMS["MARKET2APIPARAMS"];
     }
 }
-getApiParams();
 
 /**
  * Called when a message is received through the chrome runtime
@@ -104,7 +103,6 @@ getApiParams();
     return true;
 });
 
-
 /**
  * Gets all the data that popup.js needs to render the page.
  * 1. get the list of Our Brand products
@@ -115,7 +113,7 @@ getApiParams();
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
-    // try {
+    try {
         await init();
         
         // The following arrays will both contain DOM elements like div[data-asin]
@@ -126,7 +124,9 @@ async function loadContent() {
         // For debugging purposes...
         output_products('API Results', api_results);
         output_products('Products on page', page_products);
-        
+
+        deleteCookie();
+
         const page_height = document.body.scrollHeight;
 
         // Which products have the honor of going into the overlap array?
@@ -152,9 +152,6 @@ async function loadContent() {
             }
         }
 
-        // Add this functionality later.
-        // await submitToMarkup(overlap);
-
         console.log('overlap', overlap.length);
 
         // This is what gets parsed by the popup.js to create the content
@@ -167,15 +164,24 @@ async function loadContent() {
         // console.log(JSON.stringify(overlap));
         return content;
 
-    // } catch(e) {
-    //     console.log(e.stack)
-    //     return {"error": `problem getting content. ${e.message}`};
-    // }
+    } catch(e) {
+        console.log(e.stack)
+        return {"error": `problem getting content. ${e.message}`};
+    }
 }
 
+/**
+ * Deletes session-id cookies, which messes up subsequent pages.
+ */
+function deleteCookie() {
+    var domain = window.location.host.replace('smile.', 'www.').replace('www.', '.');
+    var expireDate = new Date(-1).toUTCString();
+    document.cookie = "session-id=; domain=" + domain + "; path=/; expires=" + expireDate;
+}
 
 /**
- * 
+ * Read YAML files to create constants used in the extension.
+ * Also gets API params from the cloud.
  */
 var inited = false;
 async function init() {
@@ -193,13 +199,15 @@ async function init() {
     titles.forEach(t => TITLE_PATTERNS.push(new RegExp(t, "i")) )
     //console.log("TITLE_PATTERNS", TITLE_PATTERNS);
 
+    getApiParams();
+
     inited = true;
     return;
 }
  
 
  /**
-  * 
+  * Loads local YAML file.
   * @param {*} filename 
   * @returns 
   */
@@ -208,8 +216,6 @@ async function loadYAML(filename) {
     const str = await get(url);
     return jsyaml.load(str);
 }
- 
-
 
 /**
  * Print a list of products to the console for debugging purposes
@@ -239,6 +245,9 @@ function stain(asin) {
 
     document.querySelectorAll(`div[data-asin='${asin}'] img.s-image`).forEach( p => {
             p.style.cssText += 'border: 4px solid #ff990095 !important;';
+    });
+    document.querySelectorAll(`div[data-asin='${asin}'] div.s-image-overlay-grey`).forEach( p => {
+        p.classList.remove(`s-image-overlay-grey`)
     });
 }
 
@@ -434,16 +443,6 @@ async function getAPIEndpoint() {
         console.log(`Using Our Brands link to construct api endpoint`);
         var url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
         const urlParams = new URLSearchParams(url);
-        
-        // for (arg of ['ref', 'rh']) {
-        //     if (urlParams.has(arg)) {
-        //         let val = urlParams.get(arg).split(',').pop()
-        //         MARKET2APIPARAMS[host][arg] = val;
-        //         console.log(`${arg}: ${val}`);
-        //     }
-        // }
-        // console.log("Saving most up to date API params.");
-        // await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
         return url;
 
     } catch(e) {
@@ -552,6 +551,8 @@ async function getOurBrandsProducts() {
 
     } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < MAX_API_PAGES);
 
+   
+
     return products;
 }
 
@@ -616,44 +617,6 @@ function getProducts(objects) {
     }
     return search_results;
 }
-
-
-
-
-// /**
-//  * Post some stuff to MRKP_ENDPOINT.  
-//  * If it fails, don't freak out. Just console.out the error and move on. 
-//  */
-// async function submitToMarkup(products) {
-//     try {
-//         const devMode = await isDev();
-//         const endpoint = (devMode)
-//             ? "https://asin-collector.editorial-sandbox.themarkup.org/upload"
-//             : "https://asin-collector.editorial.themarkup.org/upload";
-    
-//         // Filter out any products that we've seen before (that are in the "seen_asins" array)
-//         const store = await storage.load({"seen_asins": []});
-//         const data = products.filter(p => !store.seen_asins.includes(p.asin));
-
-//         if(data.length > 0) {
-//             console.log(`posting data to ${endpoint}`, data)
-//             await post(endpoint, JSON.stringify(data));
-            
-//             // Add the new ASINS to the seen_asins list and save it back to storage.
-//             for(const p of data) {
-//                 store.seen_asins.push( p.asin )
-//             }
-//             //console.log("store", store);
-//             await storage.save(store);
-
-//         } else {
-//             console.log("No new products to post to the Markup")
-//         }
-//     } catch(e) {
-//         console.log("error in submitToMarkup", e);
-//     }
-// }
-
 
 
 /**
