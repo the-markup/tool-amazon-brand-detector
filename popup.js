@@ -70,7 +70,8 @@ function onContent(content) {
             html = '<h2>Error</h2>';
             html += content.error;
         } else if(content.products.length > 0) {
-            html = '<h2>Amazon Brand Buster</h2>';
+            html = '<h2>Brand Buster</h2>';
+            html += `<p>Found Amazon brands and exclusive products on the page.</p>`;
             html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
             html += `<ol>`;
             content.products.forEach(p => {
@@ -83,11 +84,24 @@ function onContent(content) {
 
 
         } else {
-            html += '<h2>There are no Amazon brands on this page</h2>';
+            // this doesn't matter if we have a static landing.
+            html = '<h2>Brand Buster</h2>';
+            html += `<p>Didn't find any Amazon brands or exclusive products on the page.</p>`;
+            html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
+            html += `<ol>`;
+            content.products.forEach(p => {
+                html += '<li>';
+                html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})<br>`;
+                html +=  `<img src="${p.image_src}" style="width:100px;"/>`
+                html += '</li>';
+            });
+            html += '</ol>';
         }
 
     } catch(e) {
-        html = "error rendering content: " + e;
+        // html = "error rendering content: " + e;
+        html = `<h2>Brand Buster</h2>`
+        html += `<p>This is not an Amazon search page!</p>`
     }
 
     document.getElementById('theContent').innerHTML = html;
