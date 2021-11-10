@@ -1,0 +1,25 @@
+{{#if error}}
+    <h2>Error</h2>
+    {{error}}
+{{else}}
+    <h2>Brand Buster</h2>
+    {{#if num_products}}
+        <p>Found Amazon brands and exclusive products on the page.</p>
+        <p>{{num_on_page}} products total. {{num_products}} are Amazon.</p>
+        <ol>
+            {{#each products}}
+                <li>
+                    <a href="{{link}}">{{title}}</a> ({{method}})<br>
+                    <img src="{{src}}" style="width:100px;"/>
+                </li>
+            {{/each}}
+        </ol>
+    {{else}}
+        <p>Didn't find any Amazon brands or exclusive products on the page.</p>
+    {{/if}}
+{{/if}}
+
+<p class="utility-links">
+    <a href="#" onclick="clear_storage()">Clear Local Storage</a> | 
+    <a href="#" onclick="log_storage()">Log Local Storage</a>
+</p>

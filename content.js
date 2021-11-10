@@ -4,7 +4,7 @@ const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
 const PUBLIC_FILE = "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json";
-var MARKET2APIPARAMS = {};
+const MARKET2APIPARAMS = {};    // always default to const if you can. 
 
 
 // We want to immediately load content when the content script loads
@@ -45,12 +45,17 @@ async function updateApiParams() {
     let headers = 'Cache-Control: no-cache';
     let resp = await get(PUBLIC_FILE, headers)
     console.log(resp);
-    MARKET2APIPARAMS = JSON.parse(resp);
-    console.log(MARKET2APIPARAMS);
-    await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
-    await storage.save({"lastChecked": TODAY});
+    try {
+        MARKET2APIPARAMS = JSON.parse(resp);
+        console.log(MARKET2APIPARAMS);
+        await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
+        await storage.save({"lastChecked": TODAY});
+    } catch(e) {
+        console.log("Failed to parse API params", e.message);
+    }
     // console.log(MARKET2APIPARAMS);
 }
+
 
 async function getApiParams() {
     let lastChecked = await storage.load("lastChecked");
@@ -199,7 +204,7 @@ async function init() {
     titles.forEach(t => TITLE_PATTERNS.push(new RegExp(t, "i")) )
     //console.log("TITLE_PATTERNS", TITLE_PATTERNS);
 
-    getApiParams();
+    await getApiParams();
 
     inited = true;
     return;
@@ -252,13 +257,26 @@ function stain(asin) {
 }
 
 /**
- * Returns true if ele is an "Our Brand" product, which is determined using a few tests.
+ * Returns a string if ele is an "Our Brand" product, false otherwise
+ * This is determined using a few tests.
  * NOTE: This is where you can add more checks. 
  * It should be trivial to make this async and throw an "await" in front of the call above.
+ * @returns a string describing how it was determined that the product was recognized as an Amazon product
  */
 function isAmazonBrand(ele, api_results, carousel_asins) {
-    if(ele.textContent.match(/(Featured from our brands|Präsentiert von unseren Marken|In evidenza dai nostri marchi|Suggestions parmi nos marques|Destacado de nuestras marcas)/))
+
+    // OPTIONAL refactoring for readability...
+    const phrases = [
+        "Featured from our brands",
+        "Präsentiert von unseren Marken",
+        "In evidenza dai nostri marchi",
+        "Suggestions parmi nos marques",
+        "Destacado de nuestras marcas" ];
+    const re = new RegExp(`(${phrases.join("|")})`);
+
+    if(ele.textContent.match(re))
         return "featured our brands";
+    
     if(isInAPIResults(ele, api_results))
         return "api";
 
@@ -439,7 +457,19 @@ async function getAPIEndpoint() {
     console.log(host)
     try {
         // API params are on the page.
-        const ele = await queryWaitFor('[aria-label="Our Brands"] a, [aria-label="Unsere Marken"] a, [aria-label="Nuestras Marcas"] a, [aria-label="Made for Amazon"] a, [aria-label="Nos marques"] a, [aria-label="Nuestras marcas"] a, [aria-label="I nostri brand"] a');
+        // OPTIONAL refactoring for readability
+        const our_brands_query = [
+            "Our Brands",
+            "Unsere Marken",
+            "Nuestras Marcas",
+            "Made for Amazon",
+            "Nos marques",
+            "Nuestras marcas",
+            "I nostri brand"
+        ].map(t => `[aria-label="${t}"] a`).join(", ");
+
+        const ele = await queryWaitFor(our_brands_query);
+
         console.log(`Using Our Brands link to construct api endpoint`);
         var url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
         const urlParams = new URLSearchParams(url);
@@ -497,7 +527,7 @@ async function getOurBrandsProducts() {
 
     // get base URL so smile.amazon.com works.
     var getUrl = window.location;
-    var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+    var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
 
     let endpoint = new URL(api_url, baseUrl); 
     let page = 1;
