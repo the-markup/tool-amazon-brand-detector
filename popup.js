@@ -22,8 +22,6 @@ document.getElementById('log-storage-link').onclick = function() {
 
 
 
-
-
 /**
  * This kicks things off in popup.js
  * Query for the active tab in the browser and then decide what to do.
@@ -33,6 +31,7 @@ function fetchContent() {
     chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 
         if(tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)) {
+            // This is State 2
             console.log("Seach page")
             document.body.className = 'enabled';
             document.getElementById('theContent').innerHTML = '<img src="assets/ajax-loader.gif" />';
@@ -40,6 +39,7 @@ function fetchContent() {
             // Here's where we send the "get_content" message that is received by content.js
             chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
         } else {
+            // This is State 1
             console.log("not search page")
             document.body.className = 'disabled';
             document.getElementById('theContent').innerHTML = 'Not an Amazon search page';
@@ -74,7 +74,7 @@ function onContent(content) {
 
         if(content.error)
             throw new Error("Extension Error: "+content.error)
-
+        // This is "State 3"
         html += `<p>Found Amazon brands and exclusive products on the page.</p>`;
         html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
         html += `<ol>`;
@@ -87,6 +87,7 @@ function onContent(content) {
         html += '</ol>';
 
     } catch(e) {
+        // This is State 4
         html += `<h3>error rendering content</h3>`;
         html += `<p>${e.message}</p>`
     }
