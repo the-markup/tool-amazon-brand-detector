@@ -1,36 +1,35 @@
 console.log("popup.js", window.location.href);
 
 
+// This is needed to open links from popup.html
+window.onclick = function(e) {
+    if(e.target.href && e.target.href.startsWith("http")) 
+        chrome.tabs.create({url: e.target.href});
+}
+document.getElementById('clear-storage-link').onclick = function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, "clear_storage");
+    });
+    //chrome.storage.sync.clear();
+}
+
+document.getElementById('log-storage-link').onclick = function() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, "log_storage");
+    });
+    //chrome.storage.sync.get(null, (obj) => console.log(obj));
+}
+
+
+
 
 
 /**
  * This kicks things off in popup.js
  * Query for the active tab in the browser and then decide what to do.
  */
-function initialize() {
-    console.log("initialize()");
-
-
-    // This is needed to open links from popup.html
-    window.onclick = function(e) {
-        if(e.target.href && e.target.href.startsWith("http")) 
-            chrome.tabs.create({url: e.target.href});
-    }
-
-    document.getElementById('clear-storage-link').onclick = function() {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, "clear_storage");
-        });
-        //chrome.storage.sync.clear();
-    }
-
-    document.getElementById('log-storage-link').onclick = function() {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, "log_storage");
-        });
-        //chrome.storage.sync.get(null, (obj) => console.log(obj));
-    }
-
+function fetchContent() {
+    console.log("fetchContent()");
     chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 
         if(tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)) {
@@ -52,7 +51,6 @@ function truncate(str, len) {
     return (str.length <= len) ? str : str.slice(0, len) + '...'
 }
 
-
 /**
  * Render the content
  * @param {object} content 
@@ -63,49 +61,38 @@ function truncate(str, len) {
  */
 function onContent(content) {
     console.log("onContent", content);
-    var html;
-
+    if(chrome.runtime.lastError 
+        && chrome.runtime.lastError.message.includes("Receiving end does not exist")) {
+        setTimeout(fetchContent, 500);
+        return;
+    }
+      
+    var html = '';
     try {
-        if(content.error) {
-            html = '<h2>Error</h2>';
-            html += content.error;
-        } else if(content.products.length > 0) {
-            html = '<h2>Brand Buster</h2>';
-            html += `<p>Found Amazon brands and exclusive products on the page.</p>`;
-            html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
-            html += `<ol>`;
-            content.products.forEach(p => {
-                html += '<li>';
-                html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})<br>`;
-                html +=  `<img src="${p.image_src}" style="width:100px;"/>`
-                html += '</li>';
-            });
-            html += '</ol>';
+        if(chrome.runtime.lastError)
+            throw new Error("Chrome Runtime Error: "+chrome.runtime.lastError.message);
 
+        if(content.error)
+            throw new Error("Extension Error: "+content.error)
 
-        } else {
-            // this doesn't matter if we have a static landing.
-            html = '<h2>Brand Buster</h2>';
-            html += `<p>Didn't find any Amazon brands or exclusive products on the page.</p>`;
-            html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
-            html += `<ol>`;
-            content.products.forEach(p => {
-                html += '<li>';
-                html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})<br>`;
-                html +=  `<img src="${p.image_src}" style="width:100px;"/>`
-                html += '</li>';
-            });
-            html += '</ol>';
-        }
+        html += `<p>Found Amazon brands and exclusive products on the page.</p>`;
+        html += `<p>${content.num_on_page} products total. ${content.products.length} are Amazon.</p>`;
+        html += `<ol>`;
+        content.products.forEach(p => {
+            html += '<li>';
+            html += `<a href="${p.link}">${truncate(p.title, 50)}</a> (${p.detection_method})<br>`;
+            html +=  `<img src="${p.image_src}" style="width:100px;"/>`
+            html += '</li>';
+        });
+        html += '</ol>';
 
     } catch(e) {
-        // html = "error rendering content: " + e;
-        html = `<h2>Brand Buster</h2>`
-        html += `<p>This is not an Amazon search page!</p>`
+        html += `<h3>error rendering content</h3>`;
+        html += `<p>${e.message}</p>`
     }
 
     document.getElementById('theContent').innerHTML = html;
 };
 
 
-document.addEventListener('DOMContentLoaded', initialize);
+document.addEventListener('DOMContentLoaded', fetchContent);
