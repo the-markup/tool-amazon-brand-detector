@@ -1,18 +1,198 @@
+/* Styling for Popup */
+
+@font-face {
+    font-family: "messina";
+    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-Regular.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-Regular.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400
+}
+
+@font-face {
+    font-family: "messina";
+    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff2") format("woff2");
+    font-style: italic;
+    font-weight: 400
+}
+
+@font-face {
+    font-family: "messina";
+    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-Bold.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-Bold.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 700
+}
+
+@font-face {
+    font-family: "messina";
+    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-BoldItalic.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-BoldItalic.woff2") format("woff2");
+    font-style: italic;
+    font-weight: 700
+}
+
 body {
-    font-family: system-ui, sans-serif;
-    font-size: 75%;  
+    font-family: "messina", sans-serif;
+    font-size: 75%;
+    margin: 0;
+}
+
+body.close {
+    display: none;
 }
 
 body.enabled {
-    width: 500px;
-    height: 100%;
+    width: 450px;
 }
 
 body.disabled {
-    width: 300px;
-    height: 40px;
+    width: 450px;
 }
 
-.utility-links{
+.utility-links {
     font-size: smaller;
+}
+
+h2 {
+    margin: 0;
+}
+
+/*Top Bar*/
+
+.bar {
+    background-color: #F3F2F1;
+    margin: 0;
+}
+
+.bar h2 {
+    padding: 2%;
+    border-bottom: 1px solid #000;
+    font-weight: 300;
+    font-size: 1.25rem;
+    padding: 3% 4%;
+    display: flex;
+    justify-content: space-between;
+}
+
+#close {
+    display: flex;
+}
+
+/*Status Content*/
+
+#theContent {
+    font-size: 1.15rem;
+    line-height: 1.4;
+    padding: 3% 4% 5% 4%;
+    font-weight: 700;
+}
+
+/*Accordions*/
+
+/*Accordion headings
+*/
+
+.accordion-div{
+margin-bottom:3%;
+}
+
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 300;
+      margin: 0 4%;
+    padding: 2% 0;
+      background-color: #ffffff;
+    color: #000;
+    cursor: pointer;
+    width: 92%;
+    border: none;
+    text-align: left;
+    outline: none;
+    transition: 0.4s;
+    border-top: 1px dotted #000000;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: .55rem;
+    letter-spacing: 0.02em;
+}
+
+/* Change color of the heading and icon (on hover and click) */
+.active, .accordion:hover, .accordion:hover::after {
+  /*background-color: #007eff;
+  color: white;*/
+}
+
+/* Add "plus" sign (+) after Accordion */
+.accordion::after {
+  content: '\002B';
+  color: #777;
+  font-weight: bold;
+  float: right;
+}
+
+/* Add "minus" sign (-) after Accordion (when accordion is active) */
+.active::after {
+  content: "\2212";
+  color: white;
+}
+
+/* Style the accordion panel */
+.accordion-panel {
+  padding: 0 18px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.2s ease-out;
+}
+
+/*.active ~ .identification{
+        padding-bottom: 2%;
+
+}*/
+
+.xtra{
+    padding-right:3%;
+}
+
+.identification{
+    max-height:250px;
+    overflow-y:auto;
+}
+
+::-webkit-scrollbar {
+    background-color: #F3F2F1;
+    -webkit-appearance: none;
+    width: 7px;
+    height: 200px;
+        border-radius: 4px;
+
+
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    height: 3px;
+    background-color: #CAC9C9;
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+/* States */
+
+.loading .bar {
+    background-color: #DAE9EC;
+}
+
+.loaded .bar {
+    background-color: rgba(255, 153, 0, 0.6);
+}
+
+/* Selection text */
+
+.selection {
+    background-color: #DFFE5A;
+}
+
+/*Heading text*/
+
+.heading{
+    font-weight:700;
 }

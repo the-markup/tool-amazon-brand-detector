@@ -1,16 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="popup.css">
-    
-  </head>
-  <body>
-    <h2>Brand Buster</h2>
+</head>
+
+<body>
+    <div class="bar">
+        <h2>
+            <span>Amazon Brand Buster</span>
+        </h2>
+    </div>
     <div id="theContent"></div>
-    <p class="utility-links">
-        <a href="#" id="clear-storage-link">Clear Local Storage</a> | 
-        <a href="#" id="log-storage-link">Log Local Storage</a>
-    </p>
+    <div class="accordion-div">
+        
+  <h2 class="accordion">About</h2>
+  <div class="accordion-panel">
+    <div class="xtra">
+    <p>The Markup built Brand Buster to reveal which products are Amazon brands and exclusives in search results.
+                    <br><br>
+                    Amazon has trademarked 150 private label brands and has hundreds of contractors who produce exclusive products. A year-long investigation by The Markup found that these Amazon brands and exclusives frequently out-ranked competitors with more reviews and higher ratings, and were disproportionately placed in the top search result. Most Americans in a national survey did not recognize Amazon’s best-selling brands, and only about four-in-ten Amazon brand and exclusive products from popular searches were labelled as such.
+                    <br><br>
+                    Read more about how this affects sellers, our findings, and how this extension works (link TK).
+                    <br><br>
+                    The Markup is a non-profit non-partisan investigative newsroom.</p>
+  </div>
+</div>
+
+  <h2 class="accordion">Identification Methods</h2>
+  <div class="accordion-panel ">
+    <div class="identification xtra">
+    <p>Almost <span class="selection">40 percent</span> of Amazon brands and exclusive products were unlabeled in popular searches. This extension builds off a methodology we developed that combines five different approaches of identifying products as Amazon.<br>
+                <div class="heading">"Featured from our brands"</div>
+                This product was identified due to a public-facing "Featured from Our Brands" label. The source code identifies these postings as “sponsored.” Amazon says "Featured From Our Brands" is neither an ad nor a search result, but rather "merchandising placement." Almost ninety percent of the Amazon brands and exclusives placed in the top search result in our investigation were “Featured from Our Brands.”<br><br>
+                <div class="heading">Carousel</div>
+               This product was identified in a carousel devoted to Amazon's brands and exclusives. Such carousels are not included in the search results in the source code. These carousels are present in about three in four of the popular search pages we analyzed.<br><br>
+                <div class="heading">“Our brands” Filter</div>
+                This product was listed in the "Our Brands" filter, which we accessed in the background of the search page using an API call. Amazon describes "our brands" as "a collection of Amazon private brands and a curated selection of brands sold exclusively on Amazon."<br><br>
+                <div class="heading">Proprietary Electronic</div>
+                This product was either identified via the Amazon Best-Seller list for "Amazon Devices & Accessories," or it was added manually. This category is made up of electronics like Ring doorbells, Fire TVs, and Kindles.<br><br>
+                <div class="heading">Known Brands</div>
+               This extension looks for brand names like “AmazonBasics” and for disclaimers like “Amazon brand.” In a national survey, about 90 percent of respondents didn’t know that Goodthreads or Solimo were owned by Amazon. Although we found Amazon trademarked over 150 brand names, we don’t use them all.</p>
+  </div>
+  <br>
+</div>
+
+  <h2 class="accordion">Support</h2>
+  <div class="accordion-panel">
+    <div class="xtra">
+    <p>Notice something broken or weird?
+                    Send an email to TK@themarkup.org with the version of the extension, a link and a screenshot of what you’re seeing.<br><br>
+                <div class="utility-links">
+                    <a href="#" id="clear-storage-link">Clear Local Storage</a> |
+                    <a href="#" id="log-storage-link">Log Local Storage</a>
+                </div></p>
+  </div>
+</div>
+</div>
     <script src="popup.js"></script>
-  </body>
+</body>
+
 </html>
