@@ -4,16 +4,8 @@ const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
 const PUBLIC_FILE = "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json";
-const MARKET2APIPARAMS = {};    // always default to const if you can. 
+var MARKET2APIPARAMS = {};    // always default to const if you can. 
 
-
-// We want to immediately load content when the content script loads
-// Keep the promise returned from loadContent
-// This can either be chained to a then() when popup.js requests the content
-// Or it can be set to another promise when background tells the script
-// that the URL has changed. 
-let promises = { };
-promises[window.location.href] = loadContent()
 
 // The storage API is weird to me... 
 // It seems to encourage getting/setting the entire storage object
@@ -35,6 +27,16 @@ const storage = {
         });
     }
 }
+
+// We want to immediately load content when the content script loads
+// Keep the promise returned from loadContent
+// This can either be chained to a then() when popup.js requests the content
+// Or it can be set to another promise when background tells the script
+// that the URL has changed. 
+let promises = { };
+promises[window.location.href] = loadContent()
+
+
 
 
 /**
@@ -119,6 +121,15 @@ async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
     try {
+        let enabled = await storage.load('toggleisExtensionActive');
+        enabled = enabled.toggleisExtensionActive;
+        console.log("is enabled?", enabled);
+        if (enabled === undefined) { enabled = true};
+        if (enabled === false) {
+            console.log("ending");
+            throw new Error("Not enabled.")
+        }
+
         await init();
         
         // The following arrays will both contain DOM elements like div[data-asin]
