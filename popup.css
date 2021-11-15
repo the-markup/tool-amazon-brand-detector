@@ -54,6 +54,10 @@ h2 {
     margin: 0;
 }
 
+p{
+  margin:0;
+}
+
 /*Top Bar*/
 
 .bar {
@@ -150,8 +154,8 @@ margin-bottom:3%;
 }*/
 
 .xtra{
-    padding-right:3%;
-}
+/*    padding-right:3%;
+*/}
 
 .identification{
     max-height:250px;
