@@ -250,20 +250,32 @@ function output_products(title, products) {
  * Additional selectors are for UI elements like colors of clothing
  * and whitespace for badges
  */
-function stain(asin) {
+function stain(asin) {   
+    // stain
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
         p.style.cssText += 'background:#ff990095; transition:all 0.5s linear; opacity: 1 !important;';
     });
-
-    document.querySelectorAll(`div[data-asin='${asin}'] div.s-color-swatch-container, div[data-asin='${asin}'] div.s-grid-status-badge-container-dark, div[data-asin='${asin}'] div.s-image-elevated-grid-grey-overlay`).forEach( p => {
+    // bounding boxes around images.
+    document.querySelectorAll(`div[data-asin='${asin}'] img.s-image`).forEach( p => {
+        p.style.cssText += 'border: 4px solid #ff990095 !important;';
+    });
+    // remove opaque elements
+    let opaqueElements = [
+        "s-color-swatch-container", 
+        "s-grid-status-badge-container-dark", 
+        "s-image-elevated-grid-grey-overlay"
+    ].map(t => `div[data-asin='${asin}'] div.${t}`).join(", ");
+    document.querySelectorAll(opaqueElements).forEach( p => {
         p.style.cssText += 'background-color: transparent !important;';
     });
-
-    document.querySelectorAll(`div[data-asin='${asin}'] img.s-image`).forEach( p => {
-            p.style.cssText += 'border: 4px solid #ff990095 !important;';
-    });
-    document.querySelectorAll(`div[data-asin='${asin}'] div.s-image-overlay-grey`).forEach( p => {
-        p.classList.remove(`s-image-overlay-grey`)
+    // remove grey overlays
+    let greyClasses = [
+        "s-image-overlay-grey", 
+        "s-image-elevated-grid-grey-overlay",
+    ]
+    let greyElements = greyClasses.map(t => `div[data-asin='${asin}'] div.${t}`).join(", ");
+    document.querySelectorAll(greyElements).forEach( p => {
+        greyClasses.forEach(toRemove => p.classList.remove(toRemove))
     });
 }
 

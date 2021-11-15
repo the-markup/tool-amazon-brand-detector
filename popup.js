@@ -63,13 +63,11 @@ function fetchContent() {
             // This is State 2
             console.log("Seach page")
             document.body.className = 'enabled loading';
+            
             document.getElementById('theContent').innerHTML = `
             <div class="loader">
                 <div class="text">Loading...</div>
                 <div class="grid-container">
-                    <div class="square"></div>
-                    <div class="square"></div>
-                    <div class="square"></div>
                     <div class="square"></div>
                     <div class="square"></div>
                     <div class="square"></div>
