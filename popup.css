@@ -276,3 +276,46 @@ margin-bottom:3%;
 
   .slider.round:before {
     border-radius: 50%;} 
+
+
+/* Loading */
+.loader {
+    width: 100px;
+    height: 120px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    margin: 0 auto;
+}
+
+.text {
+    display: block;
+    color: #666;
+    width: 100%;
+    text-transform: uppercase;
+    /* font-family: "Gill Sans", sans-serif; */
+    font-size: 1em;
+    letter-spacing: 0.1em;  
+  }
+
+.square {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    background: #ff990095;
+    transition: opacity 0.5s ease-in;
+    animation: pulse 1s infinite alternate;  
+  }
+  @for $i from 0 through 9 {
+    .square:nth-child(#{$i}) {
+      animation-delay: calc(200*#{$i}ms);
+      }
+    }
+  
+  
+  @keyframes pulse {
+    to {
+      opacity: 0;
+    }
+  }

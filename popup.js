@@ -7,38 +7,38 @@ console.log("popup.js", window.location.href);
  * @See https://bugs.chromium.org/p/chromium/issues/detail?id=971701
  * @See https://stackoverflow.com/questions/56500742/why-is-my-google-chrome-extensions-popup-ui-laggy-on-external-monitors-but-not
  */
-if (
-    // From testing the following conditions seem to indicate that the popup was opened on a secondary monitor
-    window.screenLeft < 0 ||
-    window.screenTop < 0 ||
-    window.screenLeft > window.screen.width ||
-    window.screenTop > window.screen.height
-  ) {
-    chrome.runtime.getPlatformInfo(function (info) {
-      if (info.os === 'mac') {
-        const fontFaceSheet = new CSSStyleSheet()
-        fontFaceSheet.insertRule(`
-          @keyframes redraw {
-            0% {
-              opacity: 1;
-            }
-            100% {
-              opacity: .99;
-            }
-          }
-        `)
-        fontFaceSheet.insertRule(`
-          html {
-            animation: redraw 1s linear infinite;
-          }
-        `)
-        document.adoptedStyleSheets = [
-          ...document.adoptedStyleSheets,
-          fontFaceSheet,
-        ]
-      }
-    })
-  }
+// if (
+//     // From testing the following conditions seem to indicate that the popup was opened on a secondary monitor
+//     window.screenLeft < 0 ||
+//     window.screenTop < 0 ||
+//     window.screenLeft > window.screen.width ||
+//     window.screenTop > window.screen.height
+//   ) {
+//     chrome.runtime.getPlatformInfo(function (info) {
+//       if (info.os === 'mac') {
+//         const fontFaceSheet = new CSSStyleSheet()
+//         fontFaceSheet.insertRule(`
+//           @keyframes redraw {
+//             0% {
+//               opacity: 1;
+//             }
+//             100% {
+//               opacity: .99;
+//             }
+//           }
+//         `)
+//         fontFaceSheet.insertRule(`
+//           html {
+//             animation: redraw 1s linear infinite;
+//           }
+//         `)
+//         document.adoptedStyleSheets = [
+//           ...document.adoptedStyleSheets,
+//           fontFaceSheet,
+//         ]
+//       }
+//     })
+//   }
 
   // status for ON-OFF toggle.
 var enabled = true;
@@ -63,7 +63,19 @@ function fetchContent() {
             // This is State 2
             console.log("Seach page")
             document.body.className = 'enabled loading';
-            document.getElementById('theContent').innerHTML = '<img src="assets/ajax-loader.gif" />';
+            document.getElementById('theContent').innerHTML = `
+            <div class="loader">
+                <div class="text">Loading...</div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+                <div class="square"></div>
+            </div>`;
 
             // Here's where we send the "get_content" message that is received by content.js
             chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
