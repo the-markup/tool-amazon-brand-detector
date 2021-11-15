@@ -1,31 +1,53 @@
+const manifestData = chrome.runtime.getManifest();
+const appVersion = manifestData.version
 console.log("popup.js", window.location.href);
 
-// This is needed to open links from popup.html
-window.onclick = function(e) {
-    if (e.target.href && e.target.href.startsWith("http"))
-        chrome.tabs.create({ url: e.target.href });
-}
-document.getElementById('clear-storage-link').onclick = function() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, "clear_storage");
-    });
-}
-document.getElementById('log-storage-link').onclick = function() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, "log_storage");
-    });
-}
+/**
+ * Temporary workaround for secondary monitors on MacOS where redraws don't happen
+ * @See https://bugs.chromium.org/p/chromium/issues/detail?id=971701
+ * @See https://stackoverflow.com/questions/56500742/why-is-my-google-chrome-extensions-popup-ui-laggy-on-external-monitors-but-not
+ */
+if (
+    // From testing the following conditions seem to indicate that the popup was opened on a secondary monitor
+    window.screenLeft < 0 ||
+    window.screenTop < 0 ||
+    window.screenLeft > window.screen.width ||
+    window.screenTop > window.screen.height
+  ) {
+    chrome.runtime.getPlatformInfo(function (info) {
+      if (info.os === 'mac') {
+        const fontFaceSheet = new CSSStyleSheet()
+        fontFaceSheet.insertRule(`
+          @keyframes redraw {
+            0% {
+              opacity: 1;
+            }
+            100% {
+              opacity: .99;
+            }
+          }
+        `)
+        fontFaceSheet.insertRule(`
+          html {
+            animation: redraw 1s linear infinite;
+          }
+        `)
+        document.adoptedStyleSheets = [
+          ...document.adoptedStyleSheets,
+          fontFaceSheet,
+        ]
+      }
+    })
+  }
 
-// status for ON-OFF toggle.
+  // status for ON-OFF toggle.
 var enabled = true;
-// Check Button status (once)
 chrome.storage.sync.get('toggleisExtensionActive', data => {
     enabled = data.toggleisExtensionActive;
     if (enabled === undefined) {
         enabled = true;
     }
     console.log("Logged status", enabled)
-    // What is the status?
     document.getElementById('togBtn').checked = enabled;
 });
 
@@ -85,7 +107,7 @@ function onContent(content) {
         if (content.error)
             throw new Error("Extension Error: " + content.error)
         // This is "State 3"
-        html += `Found Amazon brands and exclusive products on the page.`;
+        html += `Amazon brands and exclusive products  <span class="selection">highlighted</span> on the page.`;
         document.body.className = 'enabled loaded';
     } catch (e) {
         // Not enabled.
@@ -101,32 +123,56 @@ function onContent(content) {
 };
 
 
+/**
+ * onclick listeners...
+ */
 document.addEventListener('DOMContentLoaded', function() {
     // Collect data
     fetchContent();
 
-    // Check the extension slider (persistent)
-    document.getElementById('togBtn').onclick = function() {
-        enabled = !enabled;
-        // document.getElementById('togBtn').checked = enabled;
-        console.log("Toggled to", enabled);
-        var isChecked = this.checked;
-        console.log(isChecked);
-        chrome.storage.sync.set({'toggleisExtensionActive': enabled},function() {});
-    };
-
-    // check accordions (persistent)
-    document.querySelectorAll(".accordion").forEach((element) =>
-        element.onclick = function() {
-            console.log("click");
-            if (this.nextElementSibling.style.maxHeight) {
-                hidePanels();
-            } else {
-                showPanel(this);
-            } 
-        }  
-    );
+    // Set the app version in the support section
+    document.getElementById('appVersion').innerHTML = appVersion;
 });
+
+ // This is needed to open links from popup.html
+ window.onclick = function(e) {
+    if (e.target.href && e.target.href.startsWith("http"))
+        chrome.tabs.create({ url: e.target.href });
+}
+
+// For support
+document.getElementById('clear-storage-link').onclick = function() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, "clear_storage");
+    });
+}
+document.getElementById('log-storage-link').onclick = function() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, "log_storage");
+    });
+}
+
+// Check the extension slider (persistent)
+document.getElementById('togBtn').onclick = function() {
+    enabled = !enabled;
+    // document.getElementById('togBtn').checked = enabled;
+    console.log("Toggled to", enabled);
+    var isChecked = this.checked;
+    console.log(isChecked);
+    chrome.storage.sync.set({'toggleisExtensionActive': enabled},function() {});
+};
+
+// check accordions (persistent)
+document.querySelectorAll(".accordion").forEach((element) =>
+    element.onclick = function() {
+        console.log("click");
+        if (this.nextElementSibling.style.maxHeight) {
+            hidePanels();
+        } else {
+            showPanel(this);
+        } 
+    }  
+);
 
 
 /**
