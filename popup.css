@@ -10,7 +10,7 @@
 @font-face {
     font-family: "messina";
     src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff2") format("woff2");
-    font-style: italic;
+    font-style: italic; 
     font-weight: 400
 }
 
@@ -277,7 +277,7 @@ margin-bottom:3%;
     top: 50%;
     left: 50%;
     font-size: 8px;
-    font-family: Verdana, sans-serif;
+        font-family: "messina", sans-serif;
   }
 
   input:checked+ .slider .on
@@ -300,7 +300,8 @@ margin-bottom:3%;
 /* Loading */
 .loader {
     width: 150px;   
-    margin: 0 auto;
+    margin: 0;
+   padding: 4% 0; 
 }
 
 .text {
@@ -316,7 +317,7 @@ margin-bottom:3%;
 
 .grid-container {
   display: flex;
-  width: 140px;
+  width: 110px;
   height: 30px;
   flex-flow: row wrap;
   justify-content: space-between;
@@ -325,8 +326,8 @@ margin-bottom:3%;
 
 .square {
     display: inline-block;
-    height: 28px;
-    width: 30px;
+    height: 24px;
+    width: 24px;
     background: #ff990095;
     opacity: 0;
     transition: opacity 0.5s ease-in;
