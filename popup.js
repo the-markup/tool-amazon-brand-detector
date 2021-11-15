@@ -7,38 +7,38 @@ console.log("popup.js", window.location.href);
  * @See https://bugs.chromium.org/p/chromium/issues/detail?id=971701
  * @See https://stackoverflow.com/questions/56500742/why-is-my-google-chrome-extensions-popup-ui-laggy-on-external-monitors-but-not
  */
-// if (
-//     // From testing the following conditions seem to indicate that the popup was opened on a secondary monitor
-//     window.screenLeft < 0 ||
-//     window.screenTop < 0 ||
-//     window.screenLeft > window.screen.width ||
-//     window.screenTop > window.screen.height
-//   ) {
-//     chrome.runtime.getPlatformInfo(function (info) {
-//       if (info.os === 'mac') {
-//         const fontFaceSheet = new CSSStyleSheet()
-//         fontFaceSheet.insertRule(`
-//           @keyframes redraw {
-//             0% {
-//               opacity: 1;
-//             }
-//             100% {
-//               opacity: .99;
-//             }
-//           }
-//         `)
-//         fontFaceSheet.insertRule(`
-//           html {
-//             animation: redraw 1s linear infinite;
-//           }
-//         `)
-//         document.adoptedStyleSheets = [
-//           ...document.adoptedStyleSheets,
-//           fontFaceSheet,
-//         ]
-//       }
-//     })
-//   }
+if (
+    // From testing the following conditions seem to indicate that the popup was opened on a secondary monitor
+    window.screenLeft < 0 ||
+    window.screenTop < 0 ||
+    window.screenLeft > window.screen.width ||
+    window.screenTop > window.screen.height
+  ) {
+    chrome.runtime.getPlatformInfo(function (info) {
+      if (info.os === 'mac') {
+        const fontFaceSheet = new CSSStyleSheet()
+        fontFaceSheet.insertRule(`
+          @keyframes redraw {
+            0% {
+              opacity: 1;
+            }
+            100% {
+              opacity: .99;
+            }
+          }
+        `)
+        fontFaceSheet.insertRule(`
+          html {
+            animation: redraw 1s linear infinite;
+          }
+        `)
+        document.adoptedStyleSheets = [
+          ...document.adoptedStyleSheets,
+          fontFaceSheet,
+        ]
+      }
+    })
+  }
 
   // status for ON-OFF toggle.
 var enabled = true;
@@ -120,15 +120,22 @@ function onContent(content) {
 
         if (content.error)
             throw new Error("Extension Error: " + content.error)
-        // This is "State 3"
-        html += `Amazon brands and exclusive products  <span class="selection">highlighted</span> on the page.`;
-        document.body.className = 'enabled loaded';
+            console.log(content)
+        if (content.products.length !== 0) {
+            // This is "State 3"
+            html += `Amazon brands and exclusive products <span class="selection">highlighted</span>on the page.`;
+            document.body.className = 'enabled loaded';
+        } else {
+            // This is "State 4"
+            html += `No Amazon brands and exclusive products on the page.`;
+            document.body.className = 'enabled loaded';
+        }
     } catch (e) {
         // Not enabled.
         if (e.message == "Extension Error: problem getting content. Not enabled.") {
             html += "<p>Extension not enabled.</p>"
         } else {
-            // This is State 4
+            // This is some error
             html += `<h3>error rendering content</h3>`;
             html += `<p>${e.message}</p>`
         }

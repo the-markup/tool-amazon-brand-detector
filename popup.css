@@ -219,8 +219,8 @@ margin-bottom:3%;
 .switch {
     position: relative;
     display: inline-block;
-    width: 65px;
-    height: 25px;
+    width: 64px;
+    height: 24px;
   }
 
   .switch input {display:none;}
@@ -242,8 +242,8 @@ margin-bottom:3%;
     content: "";
     height: 20px;
     width: 20px;
-    left: 3px;
-    bottom: 3px;
+    left: 2px;
+    bottom: 2px;
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
