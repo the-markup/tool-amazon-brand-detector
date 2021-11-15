@@ -40,12 +40,12 @@ body.close {
 
 body.enabled {
     width: 450px;
-    height: 450px;
+    height: 480px;
 }
 
 body.disabled {
     width: 450px;
-    height: 450px;
+    height: 480px;
 
 }
 
@@ -123,7 +123,7 @@ margin-bottom:3%;
     border-top: 1px dotted #000000;
     text-transform: uppercase;
     font-weight: 700;
-    font-size: .55rem;
+    font-size: .7rem;
     letter-spacing: 0.02em;
 }
 
@@ -159,6 +159,8 @@ margin-bottom:3%;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.2s ease-out;
+    font-size: .8rem;
+        line-height: 1.25;
 }
 
 /*.active ~ .identification{
@@ -167,11 +169,11 @@ margin-bottom:3%;
 }*/
 
 .xtra{
-/*    padding-right:3%;
-*/}
+    padding-right:3%;
+}
 
 .identification{
-    max-height:200px;
+    max-height: 190px;
     overflow-y:auto;
 }
 
