@@ -299,7 +299,7 @@ margin-bottom:3%;
 
 /* Loading */
 .loader {
-    width: 100px;   
+    width: 150px;   
     margin: 0 auto;
 }
 
@@ -316,8 +316,8 @@ margin-bottom:3%;
 
 .grid-container {
   display: flex;
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 30px;
   flex-flow: row wrap;
   justify-content: space-between;
   align-content: space-between;
@@ -325,7 +325,7 @@ margin-bottom:3%;
 
 .square {
     display: inline-block;
-    height: 30px;
+    height: 28px;
     width: 30px;
     background: #ff990095;
     opacity: 0;
@@ -351,26 +351,6 @@ margin-bottom:3%;
   
   .square:nth-child(4) {
     animation-delay: calc(100*4ms);
-  }
-  
-  .square:nth-child(5) {
-    animation-delay: calc(100*5ms);
-  }
-  
-  .square:nth-child(6) {
-    animation-delay: calc(100*6ms);
-  }
-  
-  .square:nth-child(7) {
-    animation-delay: calc(100*7ms);
-  }
-  
-  .square:nth-child(8) {
-    animation-delay: calc(100*8ms);
-  }
-
-  .square:nth-child(9) {
-    animation-delay: calc(100*9ms);
   }
     
   @keyframes pulse {

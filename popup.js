@@ -72,8 +72,7 @@ function fetchContent() {
                     <div class="square"></div>
                     <div class="square"></div>
                     <div class="square"></div>
-                    <div class="square"></div>
-                    <div class="square"></div>
+
                 </div>
             </div>`;
 
