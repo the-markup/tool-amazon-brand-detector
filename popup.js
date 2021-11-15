@@ -123,7 +123,7 @@ function onContent(content) {
             console.log(content)
         if (content.products.length !== 0) {
             // This is "State 3"
-            html += `Amazon brands and exclusive products <span class="selection">highlighted</span>on the page.`;
+            html += `Amazon brands and exclusive products <span class="selection">highlighted</span> on the page.`;
             document.body.className = 'enabled loaded';
         } else {
             // This is "State 4"
