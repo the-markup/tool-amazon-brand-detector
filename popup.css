@@ -40,10 +40,13 @@ body.close {
 
 body.enabled {
     width: 450px;
+    height: 480px;
 }
 
 body.disabled {
     width: 450px;
+    height: 480px;
+
 }
 
 .utility-links {
@@ -52,6 +55,10 @@ body.disabled {
 
 h2 {
     margin: 0;
+}
+
+p{
+  margin:0;
 }
 
 /*Top Bar*/
@@ -69,6 +76,10 @@ h2 {
     padding: 3% 4%;
     display: flex;
     justify-content: space-between;
+}
+
+.bar h2 span{
+  padding: 1vh 0;
 }
 
 #close {
@@ -112,7 +123,7 @@ margin-bottom:3%;
     border-top: 1px dotted #000000;
     text-transform: uppercase;
     font-weight: 700;
-    font-size: .55rem;
+    font-size: .7rem;
     letter-spacing: 0.02em;
 }
 
@@ -133,7 +144,13 @@ margin-bottom:3%;
 /* Add "minus" sign (-) after Accordion (when accordion is active) */
 .active::after {
   content: "\2212";
-  color: white;
+  color: #777;
+  font-weight: bold;
+  float: right;
+}
+
+.active + .accordion-panel{
+  margin-bottom:10px;
 }
 
 /* Style the accordion panel */
@@ -142,6 +159,8 @@ margin-bottom:3%;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.2s ease-out;
+    font-size: .8rem;
+        line-height: 1.25;
 }
 
 /*.active ~ .identification{
@@ -154,11 +173,11 @@ margin-bottom:3%;
 }
 
 .identification{
-    max-height:250px;
+    max-height: 190px;
     overflow-y:auto;
 }
 
-::-webkit-scrollbar {
+.identification::-webkit-scrollbar {
     background-color: #F3F2F1;
     -webkit-appearance: none;
     width: 7px;
@@ -168,7 +187,7 @@ margin-bottom:3%;
 
 }
 
-::-webkit-scrollbar-thumb {
+.identification::-webkit-scrollbar-thumb {
     border-radius: 4px;
     height: 3px;
     background-color: #CAC9C9;
@@ -200,8 +219,8 @@ margin-bottom:3%;
 .switch {
     position: relative;
     display: inline-block;
-    width: 90px;
-    height: 34px;
+    width: 65px;
+    height: 25px;
   }
 
   .switch input {display:none;}
@@ -213,7 +232,7 @@ margin-bottom:3%;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ca2222;
+    background-color: #e76f6f;
     -webkit-transition: .4s;
     transition: .4s;
   }
@@ -221,27 +240,27 @@ margin-bottom:3%;
   .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
   }
 
   input:checked + .slider {
-    background-color: #2ab934;
+    background-color: #65c16c;
   }
 
   input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #e76f6f;
   }
 
   input:checked + .slider:before {
-    -webkit-transform: translateX(55px);
-    -ms-transform: translateX(55px);
-    transform: translateX(55px);
+    -webkit-transform: translateX(39px);
+    -ms-transform: translateX(39px);
+    transform: translateX(39px);
   }
 
   /*------ ADDED CSS ---------*/
@@ -257,7 +276,7 @@ margin-bottom:3%;
     transform: translate(-50%,-50%);
     top: 50%;
     left: 50%;
-    font-size: 10px;
+    font-size: 8px;
     font-family: Verdana, sans-serif;
   }
 
