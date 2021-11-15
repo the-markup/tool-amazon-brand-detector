@@ -280,12 +280,7 @@ margin-bottom:3%;
 
 /* Loading */
 .loader {
-    width: 100px;
-    height: 120px;
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    align-content: space-between;
+    width: 100px;   
     margin: 0 auto;
 }
 
@@ -300,6 +295,15 @@ margin-bottom:3%;
     letter-spacing: 0.1em;  
   }
 
+.grid-container {
+  display: flex;
+  width: 100px;
+  height: 100px;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-content: space-between;
+}
+
 .square {
     display: inline-block;
     height: 30px;
@@ -307,7 +311,7 @@ margin-bottom:3%;
     background: #ff990095;
     opacity: 0;
     transition: opacity 0.5s ease-in;
-    animation: pulse 0.5s infinite alternate;  
+    animation: pulse 0.9s infinite alternate;  
   }
 
   .square:nth-child(0) {
@@ -344,6 +348,10 @@ margin-bottom:3%;
   
   .square:nth-child(8) {
     animation-delay: calc(100*8ms);
+  }
+
+  .square:nth-child(9) {
+    animation-delay: calc(100*9ms);
   }
     
   @keyframes pulse {

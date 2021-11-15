@@ -66,15 +66,17 @@ function fetchContent() {
             document.getElementById('theContent').innerHTML = `
             <div class="loader">
                 <div class="text">Loading...</div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
-                <div class="square"></div>
+                <div class="grid-container">
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                    <div class="square"></div>
+                </div>
             </div>`;
 
             // Here's where we send the "get_content" message that is received by content.js
