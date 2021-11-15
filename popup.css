@@ -295,3 +295,86 @@ margin-bottom:3%;
 
   .slider.round:before {
     border-radius: 50%;} 
+
+
+/* Loading */
+.loader {
+    width: 100px;   
+    margin: 0 auto;
+}
+
+.text {
+    display: block;
+    color: #666;
+    width: 100%;
+    text-transform: uppercase;
+    font-family: "messina", sans-serif;
+    font-size: 16px;
+    font-weight: 200;
+    letter-spacing: 0.1em;  
+  }
+
+.grid-container {
+  display: flex;
+  width: 100px;
+  height: 100px;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-content: space-between;
+}
+
+.square {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    background: #ff990095;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+    animation: pulse 0.9s infinite alternate;  
+  }
+
+  .square:nth-child(0) {
+    animation-delay: calc(100*0ms);
+  }
+  
+  .square:nth-child(1) {
+    animation-delay: calc(100*1ms);
+  }
+  
+  .square:nth-child(2) {
+    animation-delay: calc(100*2ms);
+  }
+  
+  .square:nth-child(3) {
+    animation-delay: calc(100*3ms);
+  }
+  
+  .square:nth-child(4) {
+    animation-delay: calc(100*4ms);
+  }
+  
+  .square:nth-child(5) {
+    animation-delay: calc(100*5ms);
+  }
+  
+  .square:nth-child(6) {
+    animation-delay: calc(100*6ms);
+  }
+  
+  .square:nth-child(7) {
+    animation-delay: calc(100*7ms);
+  }
+  
+  .square:nth-child(8) {
+    animation-delay: calc(100*8ms);
+  }
+
+  .square:nth-child(9) {
+    animation-delay: calc(100*9ms);
+  }
+    
+  @keyframes pulse {
+    to {
+      opacity: 1;
+    }
+  }
