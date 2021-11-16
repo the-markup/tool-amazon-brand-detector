@@ -1,4 +1,4 @@
-const MAX_API_PAGES = 5;
+const MAX_API_PAGES = 3;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
@@ -203,15 +203,15 @@ var inited = false;
 async function init() {
     if(inited) return;
 
-    const asins = await loadYAML("asins.yaml");
+    const asins = await loadYAML("data/asins.yaml");
     Array.prototype.push.apply(KNOWN_ASINS, Object.keys(asins));
     //console.log("KNOWN_ASINS", KNOWN_ASINS);
 
-    const subtitles = await loadYAML("subtitles.yaml");
+    const subtitles = await loadYAML("data/subtitles.yaml");
     Array.prototype.push.apply(SUBTITLE_MATCHES, subtitles);
     //console.log("SUBTITLE_MATCHES", SUBTITLE_MATCHES);
 
-    const titles = await loadYAML("titles.yaml");
+    const titles = await loadYAML("data/titles.yaml");
     titles.forEach(t => TITLE_PATTERNS.push(new RegExp(t, "i")) )
     //console.log("TITLE_PATTERNS", TITLE_PATTERNS);
 
@@ -500,6 +500,9 @@ async function getAPIEndpoint() {
 
     } catch(e) {
         console.log(e)
+        if (host == "www.amazon.in") {
+            return null
+        }
         // Construct API based on dictionary and current link.
         console.log(`Didn't find Our Brands link. Using fallback method.`);
         var url = new URL(window.location.href.replace("/s?", "/s/query?"));
@@ -557,6 +560,9 @@ async function getOurBrandsProducts() {
     let products = [];
     let metadata = null;
 
+    if (api_url === null) {
+        return products
+    }
     // Call the API endpoint repeatedly while increasing page number until there are no more products.
     do {
         // Set the page number of results we want.

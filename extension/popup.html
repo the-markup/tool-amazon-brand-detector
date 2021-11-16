@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="bar">
+    <h2>
+      <span>Amazon Brand Detector</span>
+      <label class="switch">
+        <input type="checkbox" id="togBtn">
+          <div class="slider round">
+            <!--ADDED HTML -->
+            <span class="on">ON</span>
+            <span class="off">OFF</span>
+            <!--END-->
+          </div>
+      </label>
+    </h2>
+  </div>
+
+  <div id="theContent"></div>
+  
+  <div class="accordion-div">  
+    <h2 class="accordion">About</h2>
+    <div class="accordion-panel">
+      <div class="xtra">
+      <p>
+        The Markup built this extension to reveal Amazon brands and exclusives while you shop online.
+        <br><br>
+        Amazon has trademarked over 150 private-label brands and sells hundreds of thousands of products from these brands.
+        Almost <a href="https://themarkup.org/amazons-advantage/2021/10/14/how-we-analyzed-amazons-treatment-of-its-brands-in-search-results#how-often-are-products-from-amazon-brands-and-exclusives-labeled">40 percent</a> of Amazon brands and exclusives in popular searches were not disclosed to shoppers, 
+        and <a href="https://themarkup.org/amazons-advantage/2021/10/14/how-we-analyzed-amazons-treatment-of-its-brands-in-search-results#amazon-methodology-fig4a-survey-bars-Q1">few Americans can identify top-selling Amazon brands</a>.
+        Amazon gives itself an <a href="https://themarkup.org/amazons-advantage/2021/10/14/amazon-puts-its-own-brands-first-above-better-rated-products">unfair advantage</a> in search, placing its own brands ahead of better-rated competitors.
+        <br><br>
+        Learn more about <a href="https://themarkup.org/amazons-advantage/2021/10/14/amazon-puts-its-own-brands-first-above-better-rated-products">the story</a> behind <a href="https://themarkup.org/amazons-advantage/2021/10/14/how-we-analyzed-amazons-treatment-of-its-brands-in-search-results">these numbers</a> at The Markup.
+      </p>
+      </div>
+    </div>
+    <h2 class="accordion">Identification Methods</h2>
+    <div class="accordion-panel ">
+      <div class="identification xtra">
+      <p>
+        This extension looks for several clues to <span class="selection">highlight</span> products as Amazon.<br><br>
+        <div class="heading">"Featured from our brands"</div>
+        Labelled "Featured from Our Brands." Source code suggests these products are ads, but Amazon says they are neither an ad nor a search result, but rather "merchandising placement."<br><br>
+        <div class="heading">Carousel</div>
+        Identified in a carousel devoted to Amazon's brands and exclusives. Carousels are present in about three in four of the popular search pages we analyzed.<br><br>
+        <div class="heading">“Our brands” Filter</div>
+        Amazon describes "our brands" as "a collection of Amazon private brands and a curated selection of brands sold exclusively on Amazon." We access the filter in the background using an API call. <br><br>
+        <div class="heading">Proprietary Electronics</div>
+        Identified from the <a href="https://www.amazon.com/Best-Sellers-Amazon-Devices-Accessories/zgbs/amazon-devices/ref=zg_bs_nav_0">Amazon Best-Sellers</a> list for "Amazon Devices & Accessories," or added manually. Made up of electronics like Ring doorbells, Fire TVs, and Kindles.<br><br>
+        <div class="heading">Known Brands and Other Disclaimers</div>
+        Brand names like “AmazonBasics” and disclaimers like “Amazon brand.” See the dislaimers and brands we used on GitHub.
+        <br><br>
+        Learn about <a href="">how the extension works</a> at The Markup.
+      </p>
+      </div>
+    </div>
+  <h2 class="accordion">Support</h2>
+  <div class="accordion-panel">
+    <div class="xtra">
+      <p>
+        Notice something broken or weird?
+        Send an email to amazon-extension@themarkup.org with the version of the extension, a link and a screenshot of what you’re seeing.
+        <br><br>
+        App version: <span id="appVersion"></span>
+        <div class="utility-links">
+            <a href="#" id="clear-storage-link">Clear Local Storage</a> |
+            <a href="#" id="log-storage-link">Log Local Storage</a>
+        </div>
+      </p>
+    </div>
+  </div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
