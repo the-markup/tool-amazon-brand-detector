@@ -46,7 +46,6 @@ async function updateApiParams() {
     console.log("getting latest params from the WWW");
     let headers = 'Cache-Control: no-cache';
     let resp = await get(PUBLIC_FILE, headers)
-    console.log(resp);
     try {
         MARKET2APIPARAMS = JSON.parse(resp);
         console.log(MARKET2APIPARAMS);
@@ -55,7 +54,6 @@ async function updateApiParams() {
     } catch(e) {
         console.log("Failed to parse API params", e.message);
     }
-    // console.log(MARKET2APIPARAMS);
 }
 
 
@@ -85,7 +83,7 @@ async function getApiParams() {
  * @param {*} sendResponse 
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("onMessage request", request);
+    // console.log("onMessage request", request);
 
     // reassign the promise in response to a message from background.js saying that the URL has changed.
     if(request === "url_changed") {
@@ -119,11 +117,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
-
     try {
         let enabled = await storage.load('toggleisExtensionActive');
         enabled = enabled.toggleisExtensionActive;
-        console.log("is enabled?", enabled);
+        // console.log("is enabled?", enabled);
         if (enabled === undefined) { enabled = true};
         if (enabled === false) {
             console.log("ending");
@@ -141,9 +138,8 @@ async function loadContent() {
         output_products('API Results', api_results);
         output_products('Products on page', page_products);
 
+        // Use this to offset the cookie set by the API.
         deleteCookie();
-
-        const page_height = document.body.scrollHeight;
 
         // Which products have the honor of going into the overlap array?
         const overlap = [];
@@ -155,10 +151,6 @@ async function loadContent() {
                     title: getTitle(p), 
                     asin: getASIN(p), 
                     link: getLink(p), 
-                    height: getHeight(p),
-                    normalized_height: getHeight(p) / page_height,
-                    page_height: page_height,
-                    image_src: getImage(p),
                     date_seen: now,
                     detection_method
                 };
@@ -318,7 +310,7 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
     }
 
     if( KNOWN_ASINS.includes(getASIN(ele)))
-        return "known ASIN";
+        return "proprietary electronic ASIN";
         
     if( carousel_asins.includes(getASIN(ele)))
         return "Our Brands Carousel";
@@ -395,7 +387,6 @@ function getLink(ele) {
  */
 function getTitle(ele) {
     //console.log("getting title", ele);
-    //let header = ele.querySelector("h2, span[class~='a-truncate-full']");
     let header = ele.querySelector("h2");
     if(header) 
         return header.textContent.trim();
@@ -403,30 +394,6 @@ function getTitle(ele) {
     let image = ele.querySelector("img");
     if(image) 
         return image.getAttribute("alt");
-    
-    return "Unknown";
-}
-
-/**
- * Gets the product distance from the top from a single ASIN div element.
- * @param {Element} ele 
- */
-function getHeight(ele) {
-    let height = ele.getBoundingClientRect().top;
-    if(height) 
-        return height;
-
-    return "Unknown";
-}
-
-/**
- * Gets the product image from a single ASIN div element.
- * @param {Element} ele 
- */
-function getImage(ele) {    
-    let image = ele.querySelector("img");
-    if(image) 
-        return image.getAttribute("src");
     
     return "Unknown";
 }
@@ -477,7 +444,7 @@ async function queryWaitFor(q, timeout=3000) {
  */
 async function getAPIEndpoint() {
     var host = window.location.host.replace('smile.', 'www.');
-    console.log(host)
+    // console.log(host)
     try {
         // API params are on the page.
         // OPTIONAL refactoring for readability
@@ -506,14 +473,11 @@ async function getAPIEndpoint() {
         // Construct API based on dictionary and current link.
         console.log(`Didn't find Our Brands link. Using fallback method.`);
         var url = new URL(window.location.href.replace("/s?", "/s/query?"));
-        console.log(MARKET2APIPARAMS);
         if (MARKET2APIPARAMS.hasOwnProperty(host)) {
             apiParams = MARKET2APIPARAMS[host];
             for (const [key, value] of Object.entries(apiParams)) {
-                console.log(`${key}: ${value}`);
                 url.searchParams.set(key, value);
             }
-            console.log(url.href);
             return url.href;
         } else {
             console.log(host + " is a top-level domain, or Market that we don't have data on.");
@@ -527,7 +491,7 @@ async function getAPIEndpoint() {
  * Returns an array of ASINs
  */
 async function getCarouselProducts() {
-    console.log(`getCarouselProducts()`);
+    // console.log(`getCarouselProducts()`);
     var carousel_asins = []
     const items = document.evaluate(
         `.//div[@data-asin and ./ancestor::*[contains(@cel_widget_id, "MAIN-FEATURED_ASINS_LIST")]
@@ -546,7 +510,7 @@ async function getCarouselProducts() {
  * Returns an array of DOM elements
  */
 async function getOurBrandsProducts() {
-    console.log(`getOurBrandsProducts()`);
+    // console.log(`getOurBrandsProducts()`);
 
     // Construct the endpoint for the request
     const api_url = await getAPIEndpoint();

@@ -40,7 +40,7 @@ if (
     })
   }
 
-  // status for ON-OFF toggle.
+// status for ON-OFF toggle.
 var enabled = true;
 chrome.storage.sync.get('toggleisExtensionActive', data => {
     enabled = data.toggleisExtensionActive;
