@@ -303,7 +303,7 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
 
     const subtitle = getSubtitle(ele);
     for(const str of SUBTITLE_MATCHES) {
-        if(subtitle == str)
+        if(subtitle.toUpperCase() == str)
             return "subtitle pattern match";
         else if (subtitle.match("Amazon Brand"))
             return "subtitle pattern match";

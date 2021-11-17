@@ -1,5 +1,5 @@
 {
-    "name": "Amazon Brand Spotter",
+    "name": "Amazon Brand Finder",
     "description": "A browser extension that reveals Amazon brands and exclusives while you shop online.",
     "version": "0.0.1",
     "manifest_version": 2,
@@ -41,7 +41,6 @@
     },
     "permissions": [
         "tabs",
-        "activeTab",
         "storage",
         "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json"
     ],
