@@ -1,5 +1,5 @@
 {
-    "name": "Amazon Brand Finder",
+    "name": "Amazon Brand Detector",
     "description": "A browser extension that reveals Amazon brands and exclusives while you shop online.",
     "version": "0.0.1",
     "manifest_version": 2,
@@ -58,7 +58,7 @@
     },
     "browser_specific_settings": {
         "gecko": {
-          "id": "amazon-brand-buster@markup.org"
+          "id": "amazon-brand-detector@markup.org"
         }
       }
       
