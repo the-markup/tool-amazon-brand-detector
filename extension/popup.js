@@ -40,7 +40,7 @@ if (
     })
   }
 
-  // status for ON-OFF toggle.
+// status for ON-OFF toggle.
 var enabled = true;
 chrome.storage.sync.get('toggleisExtensionActive', data => {
     enabled = data.toggleisExtensionActive;
@@ -83,7 +83,7 @@ function fetchContent() {
             console.log("not search page")
             document.body.className = 'disabled';
             document.getElementById('theContent').innerHTML = `
-            This is not an Amazon search page. Brand Buster only works for Amazon pages.
+            This is not an Amazon search page. Amazon Brand Finder only works for Amazon pages.
             `;
         }
     });
