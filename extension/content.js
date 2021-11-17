@@ -303,7 +303,7 @@ function isAmazonBrand(ele, api_results, carousel_asins) {
 
     const subtitle = getSubtitle(ele);
     for(const str of SUBTITLE_MATCHES) {
-        if(subtitle.toUpperCase() == str)
+        if(subtitle.toUpperCase() == str.toUpperCase())
             return "subtitle pattern match";
         else if (subtitle.match("Amazon Brand"))
             return "subtitle pattern match";
@@ -573,9 +573,6 @@ async function getOurBrandsProducts() {
         page++;
 
     } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < MAX_API_PAGES);
-
-   
-
     return products;
 }
 
