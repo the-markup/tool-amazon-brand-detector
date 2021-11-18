@@ -1,4 +1,4 @@
-const MAX_API_PAGES = 3;
+const MAX_API_PAGES = 2;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];

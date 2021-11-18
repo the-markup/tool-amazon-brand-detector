@@ -59,11 +59,11 @@ function fetchContent() {
     console.log("fetchContent()");
     chrome.tabs.query({ active: true, currentWindow: true }, async function(tabs) {
 
-        if (tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)) {
+        if (tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)
+            && !tabs[0].url.match(/browse-bin/)) {
             // This is State 2
             console.log("Seach page")
             document.body.className = 'enabled loading';
-            
             document.getElementById('theContent').innerHTML = `
             <div class="loader">
                 <div class="text">Loading...</div>
@@ -72,10 +72,8 @@ function fetchContent() {
                     <div class="square"></div>
                     <div class="square"></div>
                     <div class="square"></div>
-
                 </div>
             </div>`;
-
             // Here's where we send the "get_content" message that is received by content.js
             chrome.tabs.sendMessage(tabs[0].id, "get_content", onContent);
         } else {
