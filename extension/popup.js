@@ -81,7 +81,7 @@ function fetchContent() {
             console.log("not search page")
             document.body.className = 'disabled';
             document.getElementById('theContent').innerHTML = `
-            This is not an Amazon search page. Amazon Brand Detector only works for Amazon pages.
+            Amazon Brand Detector only works on Amazon search pages.
             `;
         }
     });
