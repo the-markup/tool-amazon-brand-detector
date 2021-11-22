@@ -30,7 +30,7 @@
 
 body {
     font-family: "messina", sans-serif;
-    font-size: 75%;
+    font-size: 16px;
     margin: 0;
 }
 
@@ -40,12 +40,12 @@ body.close {
 
 body.enabled {
     width: 450px;
-    height: 480px;
+    height: 550px              ;
 }
 
 body.disabled {
     width: 450px;
-    height: 480px;
+    height: 550px;
 
 }
 
@@ -89,7 +89,7 @@ p{
 /*Status Content*/
 
 #theContent {
-    font-size: 1.15rem;
+    font-size: 18.5px;
     line-height: 1.4;
     padding: 3% 4% 5% 4%;
     font-weight: 700;
@@ -123,7 +123,7 @@ margin-bottom:3%;
     border-top: 1px dotted #000000;
     text-transform: uppercase;
     font-weight: 700;
-    font-size: .7rem;
+    font-size: 13px;
     letter-spacing: 0.02em;
 }
 
@@ -159,7 +159,7 @@ margin-bottom:3%;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.2s ease-out;
-    font-size: .8rem;
+    font-size: 12.5px;
         line-height: 1.25;
 }
 
