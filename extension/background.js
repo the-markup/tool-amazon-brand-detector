@@ -48,25 +48,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     }
 });
 
-// chrome.cookies.remove({name:"session-id", url:"https://www.amazon.com"},function(){
-//     console.log("session-id successfully deleted!");
-//   });
-
-// chrome.cookies.onchanged.addListener(function(changeInfo) {
-//     console.log('Cookie changed: ' +
-//         '\n * Cookie: ' + JSON.stringify(changeInfo.cookie) +
-//         '\n * Cause: ' + changeInfo.cause +
-//         '\n * Removed: ' + changeInfo.removed);
-
-//     // remove cookies, prevents weird All-Amazon second page
-//     var cookieUrl = window.location.protocol + '//' + window.location.host;
-//     chrome.cookies.remove({
-//         "url": cookieUrl,
-//         "name": "session-id"
-//     });
-//     console.log("delte cookie")
-// });
-
 /**
  * Change the popup icon based on the current URL
  * @param {string} url 

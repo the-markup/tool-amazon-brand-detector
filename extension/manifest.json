@@ -1,7 +1,7 @@
 {
     "name": "Amazon Brand Detector",
-    "description": "A browser extension that reveals Amazon brands and exclusives while you shop online.",
-    "version": "0.0.1",
+    "description": "A browser extension that identifies Amazon brands and exclusives while you shop online.",
+    "version": "0.0.2",
     "manifest_version": 2,
     "content_scripts": [
         {
@@ -18,7 +18,6 @@
             "https://*.amazon.fr/s?*",
             "https://*.amazon.es/s?*"
           ],
-          "exclude_globs": ["https://*.amazon.*/s?*browse-bin*"],
           "js": ["ajax.js", "content.js", "js-yaml.min.js"],
           "run_at": "document_end"
         }
@@ -40,7 +39,7 @@
     "permissions": [
         "tabs",
         "storage",
-        "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json"
+        "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json?token=ABYI6OYQ4JJP3UVKE7WIVYLBUE5M6"
     ],
     "web_accessible_resources": [
         "data/asins.yaml",

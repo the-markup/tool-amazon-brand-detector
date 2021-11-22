@@ -1,9 +1,9 @@
-const MAX_API_PAGES = 2;
+const MAX_API_PAGES = 3;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-const PUBLIC_FILE = "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json";
+const PUBLIC_FILE = "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json?token=ABYI6OYQ4JJP3UVKE7WIVYLBUE5M6";
 var MARKET2APIPARAMS = {};    // always default to const if you can. 
 
 
@@ -35,9 +35,6 @@ const storage = {
 // that the URL has changed. 
 let promises = { };
 promises[window.location.href] = loadContent()
-
-
-
 
 /**
  * Load API params from the cloud once daily
@@ -117,6 +114,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
+
+    // check the our brands filter isn't checked,,,
+    let ourBrands = document.querySelectorAll(
+        `*[aria-label="Our Brands"] input[type="checkbox"]:checked`
+    );
+    // console.log(ourBrands);
+    if (ourBrands.length > 0) {
+        console.log("our brands filtered")
+        return {"error": `our brands filter`};
+    }
+
     try {
         let enabled = await storage.load('toggleisExtensionActive');
         enabled = enabled.toggleisExtensionActive;
@@ -235,7 +243,6 @@ function output_products(title, products) {
         return { title: getTitle(p), asin: getASIN(p), link: getLink(p), dom: p };
     }));
 }
-
 
 /**
  * For a given ASIN, stains the product listing box.

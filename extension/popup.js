@@ -50,7 +50,7 @@ chrome.storage.sync.get('toggleisExtensionActive', data => {
     console.log("Logged status", enabled)
     document.getElementById('togBtn').checked = enabled;
 });
-
+//'.//li[@aria-label="Our Brands"]//input[@type="checkbox" and @checked]'
 /**
  * This kicks things off in popup.js
  * Query for the active tab in the browser and then decide what to do.
@@ -58,9 +58,7 @@ chrome.storage.sync.get('toggleisExtensionActive', data => {
 function fetchContent() {
     console.log("fetchContent()");
     chrome.tabs.query({ active: true, currentWindow: true }, async function(tabs) {
-
-        if (tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)
-            && !tabs[0].url.match(/browse-bin/)) {
+        if (tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)) {
             // This is State 2
             console.log("Seach page")
             document.body.className = 'enabled loading';
@@ -81,7 +79,7 @@ function fetchContent() {
             console.log("not search page")
             document.body.className = 'disabled';
             document.getElementById('theContent').innerHTML = `
-            Amazon Brand Detector only works on Amazon search pages.
+            Amazon Brand Detector works only on Amazon search pages.
             `;
         }
     });
@@ -128,8 +126,13 @@ function onContent(content) {
     } catch (e) {
         // Not enabled.
         if (e.message == "Extension Error: problem getting content. Not enabled.") {
-            html += "<p>Extension not enabled.</p>"
-        } else {
+            html += "Extension not enabled."
+        } 
+        // our brands
+        else if (e.message == "Extension Error: our brands filter") {
+            html += `The extension does not run on pages filtered by "Our Brands."`
+        }
+        else {
             // This is some error
             html += `<h3>error rendering content</h3>`;
             html += `<p>${e.message}</p>`
