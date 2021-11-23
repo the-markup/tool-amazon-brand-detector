@@ -39,7 +39,7 @@
     "permissions": [
         "tabs",
         "storage",
-        "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json?token=ABYI6OYQ4JJP3UVKE7WIVYLBUE5M6"
+        "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json"
     ],
     "web_accessible_resources": [
         "data/asins.yaml",

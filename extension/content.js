@@ -3,7 +3,7 @@ const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-const PUBLIC_FILE = "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json?token=ABYI6OYQ4JJP3UVKE7WIVYLBUE5M6";
+const PUBLIC_FILE = "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json";
 var MARKET2APIPARAMS = {};    // always default to const if you can. 
 
 
