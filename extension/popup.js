@@ -50,7 +50,7 @@ chrome.storage.sync.get('toggleisExtensionActive', data => {
     console.log("Logged status", enabled)
     document.getElementById('togBtn').checked = enabled;
 });
-//'.//li[@aria-label="Our Brands"]//input[@type="checkbox" and @checked]'
+
 /**
  * This kicks things off in popup.js
  * Query for the active tab in the browser and then decide what to do.
@@ -79,7 +79,7 @@ function fetchContent() {
             console.log("not search page")
             document.body.className = 'disabled';
             document.getElementById('theContent').innerHTML = `
-            Amazon Brand Detector works only on Amazon search pages.
+            Amazon Brand Detector works only on Amazon search pages, not product pages or other platforms.
             `;
         }
     });
@@ -116,11 +116,11 @@ function onContent(content) {
             console.log(content)
         if (content.products.length !== 0) {
             // This is "State 3"
-            html += `Amazon brands and exclusive products <span class="selection">highlighted</span> on the page.`;
+            html += `Amazon brands and exclusive products we found are <span class="selection">highlighted</span> on the page.`;
             document.body.className = 'enabled loaded';
         } else {
             // This is "State 4"
-            html += `No Amazon brands and exclusive products on the page.`;
+            html += `We found no Amazon brand or exclusive products on the page.`;
             document.body.className = 'enabled loaded';
         }
     } catch (e) {
@@ -129,9 +129,9 @@ function onContent(content) {
             html += "Extension not enabled."
         } 
         // our brands
-        else if (e.message == "Extension Error: our brands filter") {
-            html += `The extension does not run on pages filtered by "Our Brands."`
-        }
+        // else if (e.message == "Extension Error: our brands filter") {
+        //     html += `The extension does not un on pages filtered by "Our Brands."`
+        // }
         else {
             // This is some error
             html += `<h3>error rendering content</h3>`;

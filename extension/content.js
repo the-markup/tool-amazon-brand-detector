@@ -116,14 +116,14 @@ async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
 
     // check the our brands filter isn't checked,,,
-    let ourBrands = document.querySelectorAll(
-        `*[aria-label="Our Brands"] input[type="checkbox"]:checked`
-    );
-    // console.log(ourBrands);
-    if (ourBrands.length > 0) {
-        console.log("our brands filtered")
-        return {"error": `our brands filter`};
-    }
+    // let ourBrands = document.querySelectorAll(
+    //     `*[aria-label="Our Brands"] input[type="checkbox"]:checked`
+    // );
+    // // console.log(ourBrands);
+    // if (ourBrands.length > 0) {
+    //     console.log("our brands filtered")
+    //     return {"error": `our brands filter`};
+    // }
 
     try {
         let enabled = await storage.load('toggleisExtensionActive');
@@ -250,6 +250,7 @@ function output_products(title, products) {
  * and whitespace for badges
  */
 function stain(asin) {   
+    console.log(`stianing ${asin}`);
     // stain
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
         p.style.cssText += 'background:#ff990095; transition:all 0.5s linear; opacity: 1 !important;';
@@ -469,7 +470,6 @@ async function getAPIEndpoint() {
 
         console.log(`Using Our Brands link to construct api endpoint`);
         var url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
-        const urlParams = new URLSearchParams(url);
         return url;
 
     } catch(e) {
