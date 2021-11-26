@@ -250,7 +250,6 @@ function output_products(title, products) {
  * and whitespace for badges
  */
 function stain(asin) {   
-    console.log(`stianing ${asin}`);
     // stain
     document.querySelectorAll(`div[data-asin='${asin}']`).forEach( p => {
         p.style.cssText += 'background:#ff990095; transition:all 0.5s linear; opacity: 1 !important;';
@@ -548,7 +547,7 @@ async function getOurBrandsProducts() {
         accept-language: en-US,en;q=0.9
         x-amazon-s-swrs-version: 64CA74525CCE3ACE0B0A7551DBB2B458,D41D8CD98F00B204E9800998ECF8427E
         x-amazon-s-fallback-url: ${window.location.href}
-        rtt: 150
+        rtt: 100
         x-amazon-rush-fingerprints: 
         ect: 4g
         x-requested-with: XMLHttpRequest
