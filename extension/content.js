@@ -1,11 +1,10 @@
-const MAX_API_PAGES = 3;
+const MAX_API_PAGES = 2;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-const PUBLIC_FILE = "https://raw.githubusercontent.com/the-markup/tool-amazon-brand-detector/main/extension/data/api_params.json";
+const PUBLIC_FILE = "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json";
 var MARKET2APIPARAMS = {};    // always default to const if you can. 
-
 
 // The storage API is weird to me... 
 // It seems to encourage getting/setting the entire storage object
@@ -41,7 +40,10 @@ promises[window.location.href] = loadContent()
  */ 
 async function updateApiParams() {
     console.log("getting latest params from the WWW");
-    let headers = 'Cache-Control: no-cache';
+    let headers = `
+        Cache-Control: no-cache
+        Access-Control-Allow-Origin: *
+        content-type: application/json; charset=utf-8`;
     let resp = await get(PUBLIC_FILE, headers)
     try {
         MARKET2APIPARAMS = JSON.parse(resp);
@@ -50,6 +52,8 @@ async function updateApiParams() {
         await storage.save({"lastChecked": TODAY});
     } catch(e) {
         console.log("Failed to parse API params", e.message);
+        MARKET2APIPARAMS = await loadJSON("data/api_params.json")
+        await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
     }
 }
 
@@ -114,17 +118,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 async function loadContent() {
     console.log(`loadContent(${window.location.href})`);
-
-    // check the our brands filter isn't checked,,,
-    // let ourBrands = document.querySelectorAll(
-    //     `*[aria-label="Our Brands"] input[type="checkbox"]:checked`
-    // );
-    // // console.log(ourBrands);
-    // if (ourBrands.length > 0) {
-    //     console.log("our brands filtered")
-    //     return {"error": `our brands filter`};
-    // }
-
     try {
         let enabled = await storage.load('toggleisExtensionActive');
         enabled = enabled.toggleisExtensionActive;
@@ -145,9 +138,6 @@ async function loadContent() {
         // For debugging purposes...
         output_products('API Results', api_results);
         output_products('Products on page', page_products);
-
-        // Use this to offset the cookie set by the API.
-        deleteCookie();
 
         // Which products have the honor of going into the overlap array?
         const overlap = [];
@@ -186,14 +176,6 @@ async function loadContent() {
     }
 }
 
-/**
- * Deletes session-id cookies, which messes up subsequent pages.
- */
-function deleteCookie() {
-    var domain = window.location.host.replace('smile.', 'www.').replace('www.', '.');
-    var expireDate = new Date(-1).toUTCString();
-    document.cookie = "session-id=; domain=" + domain + "; path=/; expires=" + expireDate;
-}
 
 /**
  * Read YAML files to create constants used in the extension.
@@ -220,8 +202,6 @@ async function init() {
     inited = true;
     return;
 }
- 
-
  /**
   * Loads local YAML file.
   * @param {*} filename 
@@ -231,6 +211,12 @@ async function loadYAML(filename) {
     const url = chrome.runtime.getURL(filename);
     const str = await get(url);
     return jsyaml.load(str);
+}
+
+async function loadJSON(filename) {
+    const url = chrome.runtime.getURL(filename);
+    const str = await get(url);
+    return JSON.parse(str);
 }
 
 /**
@@ -286,7 +272,6 @@ function stain(asin) {
  * @returns a string describing how it was determined that the product was recognized as an Amazon product
  */
 function isAmazonBrand(ele, api_results, carousel_asins) {
-
     // OPTIONAL refactoring for readability...
     const phrases = [
         "Featured from our brands",
@@ -450,7 +435,7 @@ async function queryWaitFor(q, timeout=3000) {
  * If not, it tries to construct it manually. 
  */
 async function getAPIEndpoint() {
-    var host = window.location.host.replace('smile.', 'www.');
+    let host = window.location.host.replace('smile.', 'www.');
     // console.log(host)
     try {
         // API params are on the page.
@@ -468,7 +453,7 @@ async function getAPIEndpoint() {
         const ele = await queryWaitFor(our_brands_query);
 
         console.log(`Using Our Brands link to construct api endpoint`);
-        var url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
+        let url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");      
         return url;
 
     } catch(e) {
@@ -516,15 +501,12 @@ async function getCarouselProducts() {
  * Returns an array of DOM elements
  */
 async function getOurBrandsProducts() {
-    // console.log(`getOurBrandsProducts()`);
-
     // Construct the endpoint for the request
     const api_url = await getAPIEndpoint();
-
+    var startingUrl = window.location;
     // get base URL so smile.amazon.com works.
     var getUrl = window.location;
     var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-
     let endpoint = new URL(api_url, baseUrl); 
     let page = 1;
     let products = [];
@@ -533,27 +515,26 @@ async function getOurBrandsProducts() {
     if (api_url === null) {
         return products
     }
+
+    // Assemble the headers
+    let headers = `
+    accept: text/html,*/*
+    downlink: 3.8
+    accept-language: en-US,en;q=0.9
+    x-amazon-s-swrs-version: 8E120209040E01A359B9DB1F03C22BA7,D41D8CD98F00B204E9800998ECF8427E
+    x-amazon-s-fallback-url: ${window.location.href}
+    rtt: 50
+    ect: 4g
+    x-requested-with: XMLHttpRequest
+    authority: www.amazon.com
+    content-type: application/json
+    `;
+
     // Call the API endpoint repeatedly while increasing page number until there are no more products.
     do {
         // Set the page number of results we want.
         console.log(`page ${page}`)
         endpoint.searchParams.set("page", page);
-
-        // Assemble the headers
-        let headers = `
-        accept: text/html,*/*
-        x-amazon-s-mismatch-behavior: FALLBACK
-        downlink: 3.8
-        accept-language: en-US,en;q=0.9
-        x-amazon-s-swrs-version: 64CA74525CCE3ACE0B0A7551DBB2B458,D41D8CD98F00B204E9800998ECF8427E
-        x-amazon-s-fallback-url: ${window.location.href}
-        rtt: 100
-        x-amazon-rush-fingerprints: 
-        ect: 4g
-        x-requested-with: XMLHttpRequest
-        authority: www.amazon.com
-        content-type: application/json`;
-
         console.log(`requesting ${endpoint.href}`);
         const start = Date.now();
         let response = await get(endpoint.href, headers);
@@ -579,6 +560,8 @@ async function getOurBrandsProducts() {
         page++;
 
     } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < MAX_API_PAGES);
+    // remove the filters
+    get(startingUrl, headers);
     return products;
 }
 
