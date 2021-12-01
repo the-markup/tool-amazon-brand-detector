@@ -2,28 +2,28 @@
 
 @font-face {
     font-family: "messina";
-    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-Regular.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-Regular.woff2") format("woff2");
+    src: url("/static/fonts/Messina/MessinaSansWeb-Regular.woff2") format("woff2");
     font-style: normal;
     font-weight: 400
 }
 
 @font-face {
     font-family: "messina";
-    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff2") format("woff2");
+    src: url("/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff2") format("woff2");
     font-style: italic; 
     font-weight: 400
 }
 
 @font-face {
     font-family: "messina";
-    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-Bold.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-Bold.woff2") format("woff2");
+    src: url("/static/fonts/Messina/MessinaSansWeb-Bold.woff2") format("woff2");
     font-style: normal;
     font-weight: 700
 }
 
 @font-face {
     font-family: "messina";
-    src: url("https://themarkup.org/static/fonts/Messina/MessinaSansWeb-BoldItalic.woff") format("woff"), url("/static/fonts/Messina/MessinaSansWeb-BoldItalic.woff2") format("woff2");
+    src: url("/static/fonts/Messina/MessinaSansWeb-BoldItalic.woff2") format("woff2");
     font-style: italic;
     font-weight: 700
 }
