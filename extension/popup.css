@@ -2,28 +2,28 @@
 
 @font-face {
     font-family: "messina";
-    src: url("/static/fonts/Messina/MessinaSansWeb-Regular.woff2") format("woff2");
+    src: url("assets/fonts/MessinaSansWeb-Regular.woff2") format("woff2");
     font-style: normal;
     font-weight: 400
 }
 
 @font-face {
     font-family: "messina";
-    src: url("/static/fonts/Messina/MessinaSansWeb-RegularItalic.woff2") format("woff2");
+    src: url("assets/fonts/MessinaSansWeb-RegularItalic.woff2") format("woff2");
     font-style: italic; 
     font-weight: 400
 }
 
 @font-face {
     font-family: "messina";
-    src: url("/static/fonts/Messina/MessinaSansWeb-Bold.woff2") format("woff2");
+    src: url("assets/fonts/MessinaSansWeb-Bold.woff2") format("woff2");
     font-style: normal;
     font-weight: 700
 }
 
 @font-face {
     font-family: "messina";
-    src: url("/static/fonts/Messina/MessinaSansWeb-BoldItalic.woff2") format("woff2");
+    src: url("assets/fonts/MessinaSansWeb-BoldItalic.woff2") format("woff2");
     font-style: italic;
     font-weight: 700
 }
@@ -40,12 +40,12 @@ body.close {
 
 body.enabled {
     width: 450px;
-    height: 530px              ;
+    height: 550px              ;
 }
 
 body.disabled {
     width: 450px;
-    height: 530px;
+    height: 550px;
 
 }
 
@@ -72,7 +72,7 @@ p{
     padding: 2%;
     border-bottom: 1px solid #000;
     font-weight: 300;
-    font-size: 18px;
+    font-size: 19px;
     padding: 3% 4%;
     display: flex;
     justify-content: space-between;
@@ -89,7 +89,7 @@ p{
 /*Status Content*/
 
 #theContent {
-    font-size: 18.5px;
+    font-size: 18px;
     line-height: 1.4;
     padding: 3% 4% 5% 4%;
     font-weight: 700;

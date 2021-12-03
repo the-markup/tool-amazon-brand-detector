@@ -1,22 +1,22 @@
 {
     "name": "Amazon Brand Detector",
     "description": "A browser extension that identifies Amazon brands and exclusives while you shop online.",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "manifest_version": 2,
     "content_scripts": [
         {
           "matches": [
-            "https://*.amazon.com/s?*",
-            "https://*.amazon.co.uk/s?*",
-            "https://*.amazon.in/s?*",
-            "https://*.amazon.co.jp/s?*",
-            "https://*.amazon.de/s?*",
-            "https://*.amazon.ca/s?*",
-            "https://*.amazon.it/s?*",
-            "https://*.amazon.com.mx/s?*",
-            "https://*.amazon.com.au/s?*",
-            "https://*.amazon.fr/s?*",
-            "https://*.amazon.es/s?*"
+            "https://*.amazon.com/*",
+            "https://*.amazon.co.uk/*",
+            "https://*.amazon.in/*",
+            "https://*.amazon.co.jp/*",
+            "https://*.amazon.de/*",
+            "https://*.amazon.ca/*",
+            "https://*.amazon.it/*",
+            "https://*.amazon.com.mx/*",
+            "https://*.amazon.com.au/*",
+            "https://*.amazon.fr/*",
+            "https://*.amazon.es/*"
           ],
           "js": ["ajax.js", "content.js", "js-yaml.min.js"],
           "run_at": "document_end"
@@ -39,7 +39,7 @@
     "permissions": [
         "tabs",
         "storage",
-        "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json"
+        "https://cdn.jsdelivr.net/gh/the-markup/tool-amazon-brand-detector@main/extension/data/api_params.json"
     ],
     "web_accessible_resources": [
         "data/asins.yaml",
