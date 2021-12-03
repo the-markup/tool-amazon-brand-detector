@@ -5,3 +5,9 @@
 - Simple Joys by Carter's|Stone & Beam
 - Amazon.com.+Gift Card
 - Amazon Basic Care
+- Kindle(.*?)[0-9] GB|Kindle Essentials Bundle
+- Fire TV Stick|Fire TV Cube
+- Echo Dot \([0-9](.*?)\G|Echo \([0-9](.*?)\G|Echo Show(.*?)\([0-9](.*?)\G
+- Echo Studio|Echo Auto|Echo Flex|Echo Spot
+- Echo Dot(.*?)\世代|Echo(.*?)\世代|Echo Show(.*?)\世代
+- Introducing Echo|Introducing Kindle|Introducing Fire
