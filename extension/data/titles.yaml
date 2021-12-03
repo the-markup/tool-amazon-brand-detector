@@ -1,13 +1,14 @@
 ---
-- Amazon Basics|AmazonBasics|Amazon Brand|Amazon Essentials|AmazonEssentials|AmazonCommercial|Amazon Commercial
+- Amazon Basics|AmazonBasics|Amazon Brand|Amazon Essentials|AmazonEssentials|AmazonCommercial|Amazon Commercial|Amazon Basic Care
 - Amazon-Marke|Amazon Marke|Marque Amazon|Marchio Amazon
+- von Amazon|by Amazon|from Amazon
 - Whole Foods Market|WFM|365 Everyday Value
-- Simple Joys by Carter's|Stone & Beam
+- Stone & Beam|Solimo
 - Amazon.com.+Gift Card
-- Amazon Basic Care
-- Kindle(.*?)[0-9] GB|Kindle Essentials Bundle
-- Fire TV Stick|Fire TV Cube
+- The new Ring|Der neue Ring|Die neue Ring
+- Kindle(.*?)[0-9] GB|Kindle(.*?)Essentials Bundle|Kindle \([0-9](.*?)\G
+- Fire TV Stick|Fire TV Cube|Fire HD (.*?)-Tablet
 - Echo Dot \([0-9](.*?)\G|Echo \([0-9](.*?)\G|Echo Show(.*?)\([0-9](.*?)\G
-- Echo Studio|Echo Auto|Echo Flex|Echo Spot
+- Echo Studio|Echo Auto|Echo Flex|Echo Spot|Echo Sub
 - Echo Dot(.*?)\世代|Echo(.*?)\世代|Echo Show(.*?)\世代
-- Introducing Echo|Introducing Kindle|Introducing Fire
+- Introducing Echo|Introducing Kindle|Introducing Fire|Introducing Ring|All new Echo

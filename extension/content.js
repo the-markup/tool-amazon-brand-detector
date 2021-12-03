@@ -1,9 +1,9 @@
-const MAX_API_PAGES = 2;
+const MAX_API_PAGES = 1;
 const TITLE_PATTERNS = [];
 const SUBTITLE_MATCHES = [];
 const KNOWN_ASINS = [];
 const TODAY = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-const PUBLIC_FILE = "https://oscarbrandysalamanderchores--public-bucket.s3.us-east-2.amazonaws.com/api_params.json";
+const PUBLIC_FILE = "https://cdn.jsdelivr.net/gh/the-markup/tool-amazon-brand-detector@main/extension/data/api_params.json";
 var MARKET2APIPARAMS = {};    // always default to const if you can. 
 
 // The storage API is weird to me... 
@@ -40,14 +40,9 @@ promises[window.location.href] = loadContent()
  */ 
 async function updateApiParams() {
     console.log("getting latest params from the WWW");
-    let headers = `
-        Cache-Control: no-cache
-        Access-Control-Allow-Origin: *
-        content-type: application/json; charset=utf-8`;
-    let resp = await get(PUBLIC_FILE, headers)
+    let resp = await get(PUBLIC_FILE)
     try {
         MARKET2APIPARAMS = JSON.parse(resp);
-        console.log(MARKET2APIPARAMS);
         await storage.save({"MARKET2APIPARAMS": MARKET2APIPARAMS});
         await storage.save({"lastChecked": TODAY});
     } catch(e) {
@@ -121,7 +116,6 @@ async function loadContent() {
     try {
         let enabled = await storage.load('toggleisExtensionActive');
         enabled = enabled.toggleisExtensionActive;
-        // console.log("is enabled?", enabled);
         if (enabled === undefined) { enabled = true};
         if (enabled === false) {
             console.log("ending");
@@ -167,7 +161,6 @@ async function loadContent() {
         };
 
         console.log("returning content", content)
-        // console.log(JSON.stringify(overlap));
         return content;
 
     } catch(e) {
@@ -187,15 +180,12 @@ async function init() {
 
     const asins = await loadYAML("data/asins.yaml");
     Array.prototype.push.apply(KNOWN_ASINS, Object.keys(asins));
-    //console.log("KNOWN_ASINS", KNOWN_ASINS);
 
     const subtitles = await loadYAML("data/subtitles.yaml");
     Array.prototype.push.apply(SUBTITLE_MATCHES, subtitles);
-    //console.log("SUBTITLE_MATCHES", SUBTITLE_MATCHES);
 
     const titles = await loadYAML("data/titles.yaml");
     titles.forEach(t => TITLE_PATTERNS.push(new RegExp(t, "i")) )
-    //console.log("TITLE_PATTERNS", TITLE_PATTERNS);
 
     await getApiParams();
 
@@ -410,7 +400,7 @@ function getSubtitle(ele) {
  * @param {*} q 
  * @param {*} timeout 
  */
-async function queryWaitFor(q, timeout=3000) {
+async function queryWaitFor(q, timeout=800) {
     return new Promise(function (resolve, reject) {
         function find() {
             ele = document.querySelector(q);
@@ -508,6 +498,9 @@ async function getOurBrandsProducts() {
     var getUrl = window.location;
     var baseUrl = getUrl.protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
     let endpoint = new URL(api_url, baseUrl); 
+
+    let currentPage = new URL(getUrl, baseUrl).searchParams.get("page") || 1
+    console.log("current page", currentPage)
     let page = 1;
     let products = [];
     let metadata = null;
@@ -521,9 +514,9 @@ async function getOurBrandsProducts() {
     accept: text/html,*/*
     downlink: 3.8
     accept-language: en-US,en;q=0.9
-    x-amazon-s-swrs-version: 8E120209040E01A359B9DB1F03C22BA7,D41D8CD98F00B204E9800998ECF8427E
+    x-amazon-s-swrs-version: 64CA74525CCE3ACE0B0A7551DBB2B458,D41D8CD98F00B204E9800998ECF8427E
     x-amazon-s-fallback-url: ${window.location.href}
-    rtt: 50
+    rtt: 100
     ect: 4g
     x-requested-with: XMLHttpRequest
     authority: www.amazon.com
@@ -559,7 +552,7 @@ async function getOurBrandsProducts() {
 
         page++;
 
-    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page < MAX_API_PAGES);
+    } while(metadata.totalResultCount > products.length && metadata.asinOnPageCount > 0 && page <= MAX_API_PAGES + (currentPage - 1));
     // remove the filters
     get(startingUrl, headers);
     return products;

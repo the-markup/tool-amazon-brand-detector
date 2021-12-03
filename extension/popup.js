@@ -58,9 +58,9 @@ chrome.storage.sync.get('toggleisExtensionActive', data => {
 function fetchContent() {
     console.log("fetchContent()");
     chrome.tabs.query({ active: true, currentWindow: true }, async function(tabs) {
-        if (tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)\/s/)) {
+        if (tabs[0].url.match(/amazon.(com|co.uk|co.jp|de|ca|com.mx|it|in|com.au|fr|es)(.*?)\/s\?/)) {
             // This is State 2
-            console.log("Seach page")
+            console.log("Search page")
             document.body.className = 'enabled loading';
             document.getElementById('theContent').innerHTML = `
             <div class="loader">
@@ -128,10 +128,6 @@ function onContent(content) {
         if (e.message == "Extension Error: problem getting content. Not enabled.") {
             html += "Extension not enabled."
         } 
-        // our brands
-        // else if (e.message == "Extension Error: our brands filter") {
-        //     html += `The extension does not un on pages filtered by "Our Brands."`
-        // }
         else {
             // This is some error
             html += `<h3>error rendering content</h3>`;
