@@ -443,7 +443,9 @@ async function getAPIEndpoint() {
         const ele = await queryWaitFor(our_brands_query);
 
         console.log(`Using Our Brands link to construct api endpoint`);
-        let url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");      
+        let url = ele.getAttribute("href").replace("/s?", "/s/query?dc&");
+        let regex = new RegExp('/s/query|k=|rh=|ref=', 'i');
+        url = url.split('&').filter(param => param.match(regex)).join('&')
         return url;
 
     } catch(e) {
@@ -536,7 +538,7 @@ async function getOurBrandsProducts() {
 
         // The XHR request returns a list of JSON objects, so let's separate them out into a list.
         const objects = parseAPIResponse(response);
-
+        console.log(response);
         // add all of the product objects to the growing product list.
         getProducts(objects).forEach( p => products.push(p) );
         console.log(`products.length ${products.length}`)
