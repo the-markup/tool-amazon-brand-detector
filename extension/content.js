@@ -455,13 +455,16 @@ async function getAPIEndpoint() {
         }
         // Construct API based on dictionary and current link.
         console.log(`Didn't find Our Brands link. Using fallback method.`);
-        var url = new URL(window.location.href.replace("/s?", "/s/query?"));
+        var url = new URL(window.location.href.replace("/s?", "/s/query?dc&"));
         if (MARKET2APIPARAMS.hasOwnProperty(host)) {
             apiParams = MARKET2APIPARAMS[host];
             for (const [key, value] of Object.entries(apiParams)) {
                 url.searchParams.set(key, value);
             }
-            return url.href;
+            url = url.href;
+            let regex = new RegExp('/s/query|k=|rh=|ref=', 'i');
+            url = url.split('&').filter(param => param.match(regex)).join('&')
+            return url;
         } else {
             console.log(host + " is a top-level domain, or Market that we don't have data on.");
             await updateApiParams();
@@ -538,7 +541,7 @@ async function getOurBrandsProducts() {
 
         // The XHR request returns a list of JSON objects, so let's separate them out into a list.
         const objects = parseAPIResponse(response);
-        console.log(response);
+        // console.log(response);
         // add all of the product objects to the growing product list.
         getProducts(objects).forEach( p => products.push(p) );
         console.log(`products.length ${products.length}`)
